@@ -16,6 +16,7 @@ function mountButton(walletBalance: number, unsettledCount = 3) {
       pending_count: 0,
       pending_amount: 0,
     },
+    last_settlement: null,
     volume_series: [],
     recent_transactions: [],
     unsettled: Array.from({ length: unsettledCount }, (_, i) => ({

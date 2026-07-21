@@ -114,6 +114,36 @@ class ReportingService
             ->all();
     }
 
+    /**
+     * The most recent settlement run, summarised across its whole batch.
+     *
+     * The dashboard's other figures answer "how much is waiting"; this answers
+     * "when did I last sweep", which is what decides whether a run is due.
+     *
+     * @return array{batch_ref: string, settled_at: string, amount: int, merchant_count: int}|null
+     */
+    public function lastSettlement(): ?array
+    {
+        $batch = Settlement::query()
+            ->selectRaw('batch_ref, MAX(settled_at) as settled_at, SUM(amount) as amount, COUNT(*) as merchant_count')
+            ->groupBy('batch_ref')
+            // Order by the batch's own timestamp, not insertion order: a run
+            // backdated during seeding would otherwise win on id.
+            ->orderByDesc('settled_at')
+            ->first();
+
+        if ($batch === null) {
+            return null;
+        }
+
+        return [
+            'batch_ref' => $batch->batch_ref,
+            'settled_at' => (string) $batch->settled_at,
+            'amount' => (int) $batch->amount,
+            'merchant_count' => (int) $batch->merchant_count,
+        ];
+    }
+
     /** Period totals for the reports screen. */
     public function summary(?DateTimeInterface $from, ?DateTimeInterface $to): array
     {

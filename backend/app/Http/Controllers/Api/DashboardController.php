@@ -16,6 +16,7 @@ class DashboardController extends Controller
             'totals' => $reporting->totals(),
             'volume_series' => $reporting->volumeSeries(),
             'unsettled' => $reporting->unsettledFloat(),
+            'last_settlement' => $reporting->lastSettlement(),
             'recent_transactions' => TransactionResource::collection(
                 Transaction::with('merchant')->latest()->limit(8)->get()
             )->resolve(),

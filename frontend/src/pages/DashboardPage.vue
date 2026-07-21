@@ -8,7 +8,7 @@ import RunSettlementButton from '../components/settlements/RunSettlementButton.v
 import StatCard from '../components/ui/StatCard.vue'
 import StatusBadge from '../components/ui/StatusBadge.vue'
 import { useDashboardStore } from '../stores/dashboard'
-import { formatDateTime } from '../utils/dates'
+import { formatDate, formatDateTime, relativeDay } from '../utils/dates'
 import { formatMoney } from '../utils/money'
 
 const dashboard = useDashboardStore()
@@ -70,6 +70,23 @@ onMounted(() => {
           :merchants="dashboard.data.unsettled"
           :total="dashboard.data.totals.wallet_balance"
         />
+
+        <p
+          v-if="!dashboard.loading"
+          class="mt-4 border-t border-white/10 pt-3 text-xs text-zinc-400"
+        >
+          <template v-if="dashboard.data?.last_settlement">
+            Last run
+            <span class="text-zinc-300">
+              {{ relativeDay(dashboard.data.last_settlement.settled_at) }}
+            </span>
+            ({{ formatDate(dashboard.data.last_settlement.settled_at) }}) —
+            {{ formatMoney(dashboard.data.last_settlement.amount) }} to
+            {{ dashboard.data.last_settlement.merchant_count }}
+            {{ dashboard.data.last_settlement.merchant_count === 1 ? 'merchant' : 'merchants' }}
+          </template>
+          <template v-else> No settlement has been run yet. </template>
+        </p>
       </section>
 
       <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

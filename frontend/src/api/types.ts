@@ -72,6 +72,13 @@ export interface DashboardData {
   recent_transactions: Transaction[]
   /** Merchants holding float, largest first — drives the settlement band. */
   unsettled: { id: number; business_name: string; wallet_balance: number }[]
+  /** The most recent settlement run, or null if none has happened. */
+  last_settlement: {
+    batch_ref: string
+    settled_at: string
+    amount: number
+    merchant_count: number
+  } | null
 }
 
 export interface DaySeriesPoint {

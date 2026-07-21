@@ -95,6 +95,42 @@ describe('pending float', function () {
     });
 });
 
+describe('lastSettlement', function () {
+    it('is null before anything has ever been settled', function () {
+        expect($this->reporting->lastSettlement())->toBeNull();
+    });
+
+    it('summarises the most recent batch, not the most recent record', function () {
+        // Two batches on different days; the newer one spans two merchants, so
+        // reading a single settlement row would understate what the run moved.
+        Settlement::factory()->create([
+            'batch_ref' => 'BATCH-OLD', 'amount' => 90_000, 'settled_at' => '2026-07-06 18:00:00',
+        ]);
+        Settlement::factory()->count(2)->create([
+            'batch_ref' => 'BATCH-NEW', 'amount' => 25_000, 'settled_at' => '2026-07-13 18:00:00',
+        ]);
+
+        $last = $this->reporting->lastSettlement();
+
+        expect($last['batch_ref'])->toBe('BATCH-NEW')
+            ->and($last['amount'])->toBe(50_000)
+            ->and($last['merchant_count'])->toBe(2)
+            ->and($last['settled_at'])->toStartWith('2026-07-13');
+    });
+
+    it('picks the latest batch even when an older one was recorded after it', function () {
+        // Row id order and settlement order are not the same thing.
+        Settlement::factory()->create([
+            'batch_ref' => 'BATCH-NEW', 'amount' => 10_000, 'settled_at' => '2026-07-20 18:00:00',
+        ]);
+        Settlement::factory()->create([
+            'batch_ref' => 'BATCH-OLD', 'amount' => 99_000, 'settled_at' => '2026-06-01 18:00:00',
+        ]);
+
+        expect($this->reporting->lastSettlement()['batch_ref'])->toBe('BATCH-NEW');
+    });
+});
+
 describe('summary series', function () {
     it('returns a daily series covering the requested range', function () {
         Transaction::factory()->create([
