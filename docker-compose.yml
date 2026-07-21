@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      APP_ENV: local
+      APP_URL: http://localhost:8080
+      FRONTEND_URL: http://localhost:8080
+      SANCTUM_STATEFUL_DOMAINS: localhost:8080,localhost
+    volumes:
+      - dbdata:/app/database
+    expose:
+      - '8000'
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - '8080:80'
+
+volumes:
+  dbdata:
