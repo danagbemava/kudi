@@ -16,18 +16,12 @@ class TransactionController extends Controller
     {
         $transactions = Transaction::query()
             ->with('merchant.institution')
-            ->when($request->filled('status'), fn ($q) => $q
-                ->where('status', $request->string('status')->toString()))
-            ->when($request->filled('merchant_id'), fn ($q) => $q
-                ->where('merchant_id', $request->integer('merchant_id')))
-            ->when($request->filled('search'), fn ($q) => $q
-                ->whereRaw('LOWER(reference) LIKE ?', ['%'.$request->string('search')->trim()->lower().'%']))
-            ->when($request->filled('from'), fn ($q) => $q
-                ->whereDate('created_at', '>=', $request->date('from')))
-            ->when($request->filled('to'), fn ($q) => $q
-                ->whereDate('created_at', '<=', $request->date('to')))
+            ->withStatus($request->string('status'))
+            ->forMerchant($request->integer('merchant_id') ?: null)
+            ->referenceLike($request->string('search'))
+            ->createdBetween($request->date('from'), $request->date('to'))
             ->latest()
-            ->paginate(min($request->integer('per_page', 15), 100));
+            ->paginate($this->perPage($request));
 
         return TransactionResource::collection($transactions);
     }

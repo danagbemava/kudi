@@ -37,7 +37,7 @@ Open **http://localhost:5173** — the Vite dev server proxies API calls to Lara
 ### Tests
 
 ```bash
-cd backend && php artisan test    # 43 tests — business rules, API, auth
+cd backend && php artisan test    # 59 tests — business rules, API, auth, reporting
 cd frontend && npm test           # 25 tests — money math, components, stores, nav
 cd frontend && npm run lint       # ESLint, incl. vue/no-undef-components
 cd frontend && npm run format:check   # Prettier, incl. Tailwind class order
@@ -80,6 +80,7 @@ The interface is built around the settlement cycle rather than around a grid of 
 - **Race-safe processing.** The gateway callback endpoint re-checks the transaction status under a row lock inside the transaction, so two concurrent callbacks cannot double-credit a wallet.
 - **A banks/mobile-money reference table** replaces the brief's free-text "bank name": merchants register against a seeded list of Ghanaian banks and mobile money providers (MTN MoMo, Telecel Cash, AT Money), which eliminates typos and mirrors real settlement rails. (Deviation from the brief's literal field list, chosen deliberately.)
 - **SPA + API, same-origin cookies.** The Vite dev server and the Docker nginx both proxy `/api` and `/sanctum` to Laravel (auth lives at `/api/login`, so the SPA keeps the `/login` page), so the Sanctum session cookie is always first-party — no cross-origin cookie fragility.
+- **Where logic lives.** Services own anything that carries an invariant — the fee, wallet crediting, the locked settlement sweep (`PaymentService`, `SettlementService`) — and read-side aggregation that is more than a query (`ReportingService`: day bucketing, zero-filling, float composition). List filtering lives in Eloquent scopes (`Merchant::search`, `Transaction::createdBetween`) which no-op on null, so controllers chain them unconditionally and stay a few lines each. Controllers only translate HTTP to those calls.
 - **State management** is Pinia stores per domain (auth, dashboard, merchants, transactions, settlements) over a typed API client with a single error-normalization path: 422s map to field errors, everything else to toast-able messages.
 
 ## Accessibility

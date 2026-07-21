@@ -20,18 +20,10 @@ class MerchantController extends Controller
     {
         $merchants = Merchant::query()
             ->with(['institution', 'wallet'])
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $term = '%'.$request->string('search')->trim()->lower().'%';
-                $query->where(function ($q) use ($term) {
-                    $q->whereRaw('LOWER(business_name) LIKE ?', [$term])
-                        ->orWhereRaw('LOWER(name) LIKE ?', [$term])
-                        ->orWhereRaw('LOWER(email) LIKE ?', [$term]);
-                });
-            })
-            ->when($request->filled('status'), fn ($query) => $query
-                ->where('status', $request->string('status')->toString()))
+            ->search($request->string('search'))
+            ->withStatus($request->string('status'))
             ->latest()
-            ->paginate(min($request->integer('per_page', 15), 100));
+            ->paginate($this->perPage($request));
 
         return MerchantResource::collection($merchants);
     }

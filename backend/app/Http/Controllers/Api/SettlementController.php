@@ -16,13 +16,10 @@ class SettlementController extends Controller
     {
         $settlements = Settlement::query()
             ->with('merchant.institution')
-            ->when($request->filled('from'), fn ($q) => $q
-                ->whereDate('settled_at', '>=', $request->date('from')))
-            ->when($request->filled('to'), fn ($q) => $q
-                ->whereDate('settled_at', '<=', $request->date('to')))
+            ->settledBetween($request->date('from'), $request->date('to'))
             ->latest('settled_at')
             ->latest('id')
-            ->paginate(min($request->integer('per_page', 15), 100));
+            ->paginate($this->perPage($request));
 
         return SettlementResource::collection($settlements);
     }

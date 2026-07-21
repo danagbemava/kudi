@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\MerchantStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -61,6 +62,31 @@ class Merchant extends Model
     public function settlements(): HasMany
     {
         return $this->hasMany(Settlement::class);
+    }
+
+    /**
+     * Free-text search across the fields a person would actually type.
+     * A null or blank term is a no-op, so callers need no conditionals.
+     */
+    public function scopeSearch(Builder $query, ?string $term): Builder
+    {
+        $term = trim((string) $term);
+
+        if ($term === '') {
+            return $query;
+        }
+
+        $like = '%'.mb_strtolower($term).'%';
+
+        return $query->where(fn (Builder $q) => $q
+            ->whereRaw('LOWER(business_name) LIKE ?', [$like])
+            ->orWhereRaw('LOWER(name) LIKE ?', [$like])
+            ->orWhereRaw('LOWER(email) LIKE ?', [$like]));
+    }
+
+    public function scopeWithStatus(Builder $query, ?string $status): Builder
+    {
+        return $status ? $query->where('status', $status) : $query;
     }
 
     public function isActive(): bool
