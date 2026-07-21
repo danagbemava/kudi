@@ -129,11 +129,11 @@ function clearFilters(): void {
       </tr>
 
       <template #cards>
-        <li v-for="merchant in merchants.items" :key="merchant.id" class="px-4 py-3">
+        <li v-for="merchant in merchants.items" :key="merchant.id" class="relative px-4 py-3 transition-colors hover:bg-zinc-50 focus-within:bg-zinc-50">
           <div class="flex items-start justify-between gap-3">
             <RouterLink
               :to="`/merchants/${merchant.id}`"
-              class="min-w-0 flex-1 text-sm font-medium text-ink hover:text-forest focus-visible:outline-2 focus-visible:outline-forest"
+              class="min-w-0 flex-1 text-sm font-medium text-ink after:absolute after:inset-0 hover:text-forest focus-visible:outline-2 focus-visible:outline-forest"
             >
               {{ merchant.business_name }}
             </RouterLink>

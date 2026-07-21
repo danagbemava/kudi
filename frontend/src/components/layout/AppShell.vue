@@ -121,43 +121,57 @@ async function logout(): Promise<void> {
     </Teleport>
 
     <div class="min-w-0 flex-1">
-      <header
-        class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-line bg-white/90 px-4 backdrop-blur sm:px-6"
-      >
-        <div class="flex items-center gap-3">
-          <button
-            ref="menuButton"
-            type="button"
-            class="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-forest lg:hidden"
-            aria-label="Open navigation menu"
-            aria-controls="main-nav"
-            :aria-expanded="drawerOpen"
-            @click="drawerOpen = true"
-          >
-            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-          </button>
-          <h1 class="font-display truncate text-lg font-semibold text-ink">
-            {{ heading }}
-          </h1>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <span class="hidden text-sm text-zinc-500 sm:block">{{ auth.user?.email }}</span>
-          <div
-            class="flex size-8 items-center justify-center rounded-full bg-forest-wash text-sm font-semibold text-forest-deep"
-            aria-hidden="true"
-          >
-            {{ auth.user?.name?.charAt(0) ?? '?' }}
+      <!-- The rule spans the full width, but the header's contents sit in the
+           same centred, max-width, equally-padded container as <main> — without
+           it the title drifts out of line with the page at ≥lg. -->
+      <header class="sticky top-0 z-30 border-b border-line bg-white/90 backdrop-blur">
+        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center gap-3">
+            <button
+              ref="menuButton"
+              type="button"
+              class="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-forest lg:hidden"
+              aria-label="Open navigation menu"
+              aria-controls="main-nav"
+              :aria-expanded="drawerOpen"
+              @click="drawerOpen = true"
+            >
+              <svg
+                class="size-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+              </svg>
+            </button>
+            <h1 class="font-display truncate text-lg font-semibold text-ink">
+              {{ heading }}
+            </h1>
           </div>
-          <button
-            type="button"
-            class="rounded-lg px-2.5 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-forest"
-            @click="logout"
-          >
-            Sign out
-          </button>
+
+          <div class="flex items-center gap-3">
+            <span class="hidden text-sm text-zinc-500 sm:block">{{ auth.user?.email }}</span>
+            <div
+              class="flex size-8 items-center justify-center rounded-full bg-forest-wash text-sm font-semibold text-forest-deep"
+              aria-hidden="true"
+            >
+              {{ auth.user?.name?.charAt(0) ?? '?' }}
+            </div>
+            <button
+              type="button"
+              class="rounded-lg px-2.5 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-forest"
+              @click="logout"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
