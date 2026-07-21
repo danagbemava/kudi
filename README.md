@@ -40,6 +40,8 @@ Open **http://localhost:5173** — the Vite dev server proxies API calls to Lara
 cd backend && php artisan test    # 43 tests — business rules, API, auth
 cd frontend && npm test           # 15 tests — money math, components, stores
 cd frontend && npm run lint       # ESLint, incl. vue/no-undef-components
+cd frontend && npm run format:check   # Prettier, incl. Tailwind class order
+cd backend  && composer format:check  # Laravel Pint
 ```
 
 ## Screens

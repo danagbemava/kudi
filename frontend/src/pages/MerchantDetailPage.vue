@@ -30,7 +30,10 @@ function load(): void {
 
 onMounted(load)
 watch(merchantId, load)
-watch(() => merchant.value?.business_name, (name) => pageTitle.set(name ?? null))
+watch(
+  () => merchant.value?.business_name,
+  (name) => pageTitle.set(name ?? null),
+)
 
 const deactivating = computed(() => merchant.value?.status === 'active')
 
@@ -96,19 +99,14 @@ async function toggleStatus(): Promise<void> {
             </h2>
             <StatusBadge :status="merchant.status" />
           </div>
-          <p class="mt-1 text-sm text-zinc-500">
-            {{ merchant.name }} · {{ merchant.email }}
-          </p>
+          <p class="mt-1 text-sm text-zinc-500">{{ merchant.name }} · {{ merchant.email }}</p>
           <p class="mt-0.5 text-sm text-zinc-500">
             {{ merchant.institution?.name }} ·
             <span class="font-mono">{{ merchant.account_number }}</span>
             · registered {{ formatDate(merchant.created_at) }}
           </p>
         </div>
-        <BaseButton
-          :variant="deactivating ? 'danger' : 'primary'"
-          @click="confirmOpen = true"
-        >
+        <BaseButton :variant="deactivating ? 'danger' : 'primary'" @click="confirmOpen = true">
           {{ deactivating ? 'Deactivate' : 'Activate' }}
         </BaseButton>
       </div>
@@ -119,7 +117,7 @@ async function toggleStatus(): Promise<void> {
           <div class="kente-thread" aria-hidden="true" />
           <div class="p-5">
             <p class="text-xs font-medium tracking-wide text-zinc-400 uppercase">Wallet balance</p>
-            <p class="font-display mt-1.5 text-2xl font-semibold">
+            <p class="mt-1.5 font-display text-2xl font-semibold">
               {{ formatMoney(merchant.wallet_balance ?? 0) }}
             </p>
             <p class="mt-1 text-sm text-zinc-400">cleared at next settlement</p>
@@ -145,7 +143,7 @@ async function toggleStatus(): Promise<void> {
       <!-- Transactions + settlements -->
       <div class="mt-6 grid gap-6 xl:grid-cols-2">
         <section>
-          <h3 class="font-display mb-3 text-sm font-semibold text-ink">Recent transactions</h3>
+          <h3 class="mb-3 font-display text-sm font-semibold text-ink">Recent transactions</h3>
           <div class="overflow-hidden rounded-xl border border-line bg-white">
             <div v-if="merchant.recent_transactions.length === 0" class="px-4 py-10">
               <EmptyState
@@ -161,7 +159,9 @@ async function toggleStatus(): Promise<void> {
                 class="flex items-center gap-3 px-4 py-3"
               >
                 <div class="min-w-0 flex-1">
-                  <p class="font-mono truncate text-xs text-zinc-500">{{ transaction.reference }}</p>
+                  <p class="truncate font-mono text-xs text-zinc-500">
+                    {{ transaction.reference }}
+                  </p>
                   <p class="text-xs text-zinc-500">{{ formatDateTime(transaction.created_at) }}</p>
                 </div>
                 <div class="text-right">
@@ -177,7 +177,7 @@ async function toggleStatus(): Promise<void> {
         </section>
 
         <section>
-          <h3 class="font-display mb-3 text-sm font-semibold text-ink">Recent settlements</h3>
+          <h3 class="mb-3 font-display text-sm font-semibold text-ink">Recent settlements</h3>
           <div class="overflow-hidden rounded-xl border border-line bg-white">
             <div v-if="merchant.recent_settlements.length === 0" class="px-4 py-10">
               <EmptyState
@@ -193,7 +193,7 @@ async function toggleStatus(): Promise<void> {
                 class="flex items-center gap-3 px-4 py-3"
               >
                 <div class="min-w-0 flex-1">
-                  <p class="font-mono truncate text-xs text-zinc-500">{{ settlement.reference }}</p>
+                  <p class="truncate font-mono text-xs text-zinc-500">{{ settlement.reference }}</p>
                   <p class="text-xs text-zinc-500">{{ formatDate(settlement.settled_at) }}</p>
                 </div>
                 <p class="font-display text-sm font-semibold text-ink">
@@ -215,8 +215,8 @@ async function toggleStatus(): Promise<void> {
         @confirm="toggleStatus"
       >
         <template v-if="deactivating">
-          <strong>{{ merchant.business_name }}</strong> will stop accepting new payments.
-          The current wallet balance of
+          <strong>{{ merchant.business_name }}</strong> will stop accepting new payments. The
+          current wallet balance of
           <strong>{{ formatMoney(merchant.wallet_balance ?? 0) }}</strong>
           is kept and will still be settled.
         </template>

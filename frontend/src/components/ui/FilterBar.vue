@@ -79,12 +79,7 @@ const panelId = useId()
         <slot name="filters" />
 
         <!-- Collapsed filters are invisible, so give applied ones a way out. -->
-        <BaseButton
-          v-if="activeCount > 0"
-          variant="ghost"
-          class="sm:hidden"
-          @click="emit('clear')"
-        >
+        <BaseButton v-if="activeCount > 0" variant="ghost" class="sm:hidden" @click="emit('clear')">
           Clear filters
         </BaseButton>
       </div>

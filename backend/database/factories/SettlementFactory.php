@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Merchant;
+use App\Models\Settlement;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<\App\Models\Settlement>
+ * @extends Factory<Settlement>
  */
 class SettlementFactory extends Factory
 {

@@ -18,7 +18,7 @@ withDefaults(
       <div class="mt-2 h-4 w-20 animate-pulse rounded bg-zinc-100" />
     </template>
     <template v-else>
-      <p class="font-display mt-1.5 text-2xl font-semibold text-ink">{{ value }}</p>
+      <p class="mt-1.5 font-display text-2xl font-semibold text-ink">{{ value }}</p>
       <p v-if="sub" class="mt-1 text-sm text-zinc-500">{{ sub }}</p>
     </template>
   </div>

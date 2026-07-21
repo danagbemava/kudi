@@ -71,9 +71,17 @@ function clearFilters(): void {
         <div class="relative basis-full sm:max-w-56 sm:flex-1 sm:basis-auto">
           <svg
             class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400"
-            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
           </svg>
           <input
             v-model="search"
@@ -99,7 +107,9 @@ function clearFilters(): void {
         <!-- From/To are one control, so they wrap as a unit and share a full row
              on small screens rather than being split across two. -->
         <div class="order-last flex basis-full items-center gap-2 sm:order-none sm:basis-auto">
-          <label class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+          <label
+            class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5"
+          >
             From
             <input
               v-model="from"
@@ -108,7 +118,9 @@ function clearFilters(): void {
               class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-zinc-300 focus:outline-2 focus:outline-offset-1 focus:outline-forest sm:w-auto"
             />
           </label>
-          <label class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+          <label
+            class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5"
+          >
             To
             <input
               v-model="to"
@@ -139,7 +151,7 @@ function clearFilters(): void {
         :key="transaction.id"
         class="transition-colors hover:bg-zinc-50/70"
       >
-        <td class="font-mono px-4 py-3 text-xs text-zinc-600">{{ transaction.reference }}</td>
+        <td class="px-4 py-3 font-mono text-xs text-zinc-600">{{ transaction.reference }}</td>
         <td class="px-4 py-3">
           <RouterLink
             v-if="transaction.merchant"
@@ -149,7 +161,7 @@ function clearFilters(): void {
             {{ transaction.merchant.business_name }}
           </RouterLink>
         </td>
-        <td class="font-display px-4 py-3 font-semibold text-ink">
+        <td class="px-4 py-3 font-display font-semibold text-ink">
           {{ formatMoney(transaction.gross_amount) }}
         </td>
         <td class="px-4 py-3 text-zinc-500">{{ formatMoney(transaction.fee_amount) }}</td>
@@ -161,7 +173,11 @@ function clearFilters(): void {
       </tr>
 
       <template #cards>
-        <li v-for="transaction in transactions.items" :key="transaction.id" class="relative px-4 py-3 transition-colors hover:bg-zinc-50 focus-within:bg-zinc-50">
+        <li
+          v-for="transaction in transactions.items"
+          :key="transaction.id"
+          class="relative px-4 py-3 transition-colors focus-within:bg-zinc-50 hover:bg-zinc-50"
+        >
           <div class="flex items-start justify-between gap-3">
             <RouterLink
               v-if="transaction.merchant"
@@ -173,7 +189,7 @@ function clearFilters(): void {
             <StatusBadge :status="transaction.status" />
           </div>
 
-          <p class="font-mono mt-0.5 truncate text-xs text-zinc-500">
+          <p class="mt-0.5 truncate font-mono text-xs text-zinc-500">
             {{ transaction.reference }} · {{ formatDateTime(transaction.created_at) }}
           </p>
 

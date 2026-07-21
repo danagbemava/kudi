@@ -41,11 +41,11 @@ const id = useId()
         :aria-describedby="error ? `${id}-error` : hint ? `${id}-hint` : undefined"
         :class="[
           'w-full rounded-lg border bg-white px-3 py-2 text-sm text-ink placeholder:text-zinc-500',
-          'focus:outline-2 focus:outline-offset-1 transition-colors',
+          'transition-colors focus:outline-2 focus:outline-offset-1',
           prefix ? 'pl-12' : '',
           error
             ? 'border-clay focus:outline-clay'
-            : 'border-field focus:outline-forest hover:border-zinc-500',
+            : 'border-field hover:border-zinc-500 focus:outline-forest',
         ]"
       />
     </div>

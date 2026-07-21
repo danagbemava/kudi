@@ -49,7 +49,8 @@ export function toApiError(error: unknown): Error {
     const message = (error.response?.data as { message?: string } | undefined)?.message
     if (message) return new Error(message)
 
-    if (!error.response) return new Error('Could not reach the server. Check your connection and retry.')
+    if (!error.response)
+      return new Error('Could not reach the server. Check your connection and retry.')
   }
 
   return new Error('Something went wrong. Please retry.')

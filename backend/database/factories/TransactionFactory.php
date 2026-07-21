@@ -4,12 +4,13 @@ namespace Database\Factories;
 
 use App\Enums\TransactionStatus;
 use App\Models\Merchant;
+use App\Models\Transaction;
 use App\Support\Money;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<\App\Models\Transaction>
+ * @extends Factory<Transaction>
  */
 class TransactionFactory extends Factory
 {

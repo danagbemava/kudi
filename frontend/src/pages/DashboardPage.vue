@@ -35,8 +35,11 @@ onMounted(() => {
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p class="label-eyebrow text-gold">Waiting to settle</p>
-            <div v-if="dashboard.loading" class="mt-2 h-10 w-56 animate-pulse rounded bg-white/15" />
-            <p v-else class="font-display mt-1 text-4xl font-semibold sm:text-5xl">
+            <div
+              v-if="dashboard.loading"
+              class="mt-2 h-10 w-56 animate-pulse rounded bg-white/15"
+            />
+            <p v-else class="mt-1 font-display text-4xl font-semibold sm:text-5xl">
               {{ formatMoney(dashboard.data?.totals.wallet_balance ?? 0) }}
             </p>
             <p class="mt-1.5 text-sm text-zinc-300">
@@ -137,7 +140,7 @@ onMounted(() => {
                 <p class="truncate text-sm font-medium text-ink">
                   {{ transaction.merchant?.business_name }}
                 </p>
-                <p class="font-mono truncate text-xs text-zinc-500">
+                <p class="truncate font-mono text-xs text-zinc-500">
                   {{ transaction.reference }} · {{ formatDateTime(transaction.created_at) }}
                 </p>
               </div>

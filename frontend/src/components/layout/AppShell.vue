@@ -151,7 +151,7 @@ async function logout(): Promise<void> {
                 />
               </svg>
             </button>
-            <h1 class="font-display truncate text-lg font-semibold text-ink">
+            <h1 class="truncate font-display text-lg font-semibold text-ink">
               {{ heading }}
             </h1>
           </div>

@@ -78,7 +78,7 @@ function clearFilters(): void {
             <p class="text-xs font-medium tracking-wide text-zinc-400 uppercase">
               Outstanding wallet balances
             </p>
-            <p class="font-display mt-1 text-2xl font-semibold">
+            <p class="mt-1 font-display text-2xl font-semibold">
               {{ dashboard.loading ? '…' : formatMoney(outstanding) }}
             </p>
             <p class="mt-0.5 text-sm text-zinc-400">
@@ -105,22 +105,26 @@ function clearFilters(): void {
         <!-- From/To are one control: they wrap as a unit and share a row
              on small screens instead of being split apart. -->
         <div class="flex basis-full items-center gap-2 sm:basis-auto">
-          <label class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+          <label
+            class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5"
+          >
             From
             <input
               v-model="from"
               type="date"
               :max="to || undefined"
-              class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-zinc-300 focus:outline-2 focus:outline-offset-1 focus:outline-forest"
+              class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-zinc-300 focus:outline-2 focus:outline-offset-1 focus:outline-forest sm:w-auto"
             />
           </label>
-          <label class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+          <label
+            class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5"
+          >
             To
             <input
               v-model="to"
               type="date"
               :min="from || undefined"
-              class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-zinc-300 focus:outline-2 focus:outline-offset-1 focus:outline-forest"
+              class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-zinc-300 focus:outline-2 focus:outline-offset-1 focus:outline-forest sm:w-auto"
             />
           </label>
         </div>
@@ -141,8 +145,8 @@ function clearFilters(): void {
         :key="settlement.id"
         class="transition-colors hover:bg-zinc-50/70"
       >
-        <td class="font-mono px-4 py-3 text-xs text-zinc-600">{{ settlement.reference }}</td>
-        <td class="font-mono px-4 py-3 text-xs text-zinc-500">{{ settlement.batch_ref }}</td>
+        <td class="px-4 py-3 font-mono text-xs text-zinc-600">{{ settlement.reference }}</td>
+        <td class="px-4 py-3 font-mono text-xs text-zinc-500">{{ settlement.batch_ref }}</td>
         <td class="px-4 py-3">
           <RouterLink
             v-if="settlement.merchant"
@@ -152,7 +156,7 @@ function clearFilters(): void {
             {{ settlement.merchant.business_name }}
           </RouterLink>
         </td>
-        <td class="font-display px-4 py-3 font-semibold text-ink">
+        <td class="px-4 py-3 font-display font-semibold text-ink">
           {{ formatMoney(settlement.amount) }}
         </td>
         <td class="px-4 py-3 whitespace-nowrap text-zinc-500">
@@ -161,7 +165,11 @@ function clearFilters(): void {
       </tr>
 
       <template #cards>
-        <li v-for="settlement in settlements.items" :key="settlement.id" class="relative px-4 py-3 transition-colors hover:bg-zinc-50 focus-within:bg-zinc-50">
+        <li
+          v-for="settlement in settlements.items"
+          :key="settlement.id"
+          class="relative px-4 py-3 transition-colors focus-within:bg-zinc-50 hover:bg-zinc-50"
+        >
           <div class="flex items-start justify-between gap-3">
             <RouterLink
               v-if="settlement.merchant"
@@ -175,7 +183,7 @@ function clearFilters(): void {
             </p>
           </div>
 
-          <p class="font-mono mt-0.5 truncate text-xs text-zinc-500">
+          <p class="mt-0.5 truncate font-mono text-xs text-zinc-500">
             {{ settlement.reference }} · {{ settlement.batch_ref }}
           </p>
           <p class="mt-1 text-xs text-zinc-500">{{ formatDateTime(settlement.settled_at) }}</p>

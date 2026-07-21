@@ -64,9 +64,17 @@ function clearFilters(): void {
         <div class="relative basis-full sm:max-w-xs sm:flex-1 sm:basis-auto">
           <svg
             class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400"
-            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
           </svg>
           <input
             v-model="search"
@@ -122,14 +130,18 @@ function clearFilters(): void {
           <p class="text-xs text-zinc-500">{{ merchant.email }}</p>
         </td>
         <td class="px-4 py-3 text-zinc-600">{{ merchant.institution?.name }}</td>
-        <td class="font-display px-4 py-3 font-semibold text-ink">
+        <td class="px-4 py-3 font-display font-semibold text-ink">
           {{ formatMoney(merchant.wallet_balance ?? 0) }}
         </td>
         <td class="px-4 py-3"><StatusBadge :status="merchant.status" /></td>
       </tr>
 
       <template #cards>
-        <li v-for="merchant in merchants.items" :key="merchant.id" class="relative px-4 py-3 transition-colors hover:bg-zinc-50 focus-within:bg-zinc-50">
+        <li
+          v-for="merchant in merchants.items"
+          :key="merchant.id"
+          class="relative px-4 py-3 transition-colors focus-within:bg-zinc-50 hover:bg-zinc-50"
+        >
           <div class="flex items-start justify-between gap-3">
             <RouterLink
               :to="`/merchants/${merchant.id}`"

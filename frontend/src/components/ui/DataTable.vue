@@ -45,7 +45,9 @@ watch(
     <div class="hidden overflow-x-auto md:block">
       <table class="w-full text-left text-sm whitespace-nowrap" :aria-busy="loading">
         <caption class="sr-only">
-          {{ label }}
+          {{
+            label
+          }}
         </caption>
         <thead>
           <tr class="border-b border-line bg-zinc-50/80">

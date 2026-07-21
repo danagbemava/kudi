@@ -18,7 +18,7 @@ class SettlementService
      * the next run rather than destroyed.
      *
      * @return array{batch_ref: string, merchant_count: int, total_amount: int}|null
-     *         null when no wallet holds a positive balance.
+     *                                                                               null when no wallet holds a positive balance.
      */
     public function run(): ?array
     {

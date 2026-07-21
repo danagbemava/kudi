@@ -60,24 +60,31 @@ const presets = [
 ]
 
 const activePreset = ref('All time')
+
+function selectPreset(preset: { label: string; days: number | null }): void {
+  activePreset.value = preset.label
+  setRange(preset.days)
+}
 </script>
 
 <template>
   <div>
     <div class="mb-5 flex flex-wrap items-center gap-3">
-      <div class="flex rounded-lg border border-line bg-white p-0.5" role="group" aria-label="Date range presets">
+      <div
+        class="flex rounded-lg border border-line bg-white p-0.5"
+        role="group"
+        aria-label="Date range presets"
+      >
         <button
           v-for="preset in presets"
           :key="preset.label"
           type="button"
           :class="[
             'rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-forest',
-            activePreset === preset.label
-              ? 'bg-ink text-white'
-              : 'text-zinc-600 hover:text-ink',
+            activePreset === preset.label ? 'bg-ink text-white' : 'text-zinc-600 hover:text-ink',
           ]"
           :aria-pressed="activePreset === preset.label"
-          @click="activePreset = preset.label; setRange(preset.days)"
+          @click="selectPreset(preset)"
         >
           {{ preset.label }}
         </button>
@@ -86,23 +93,27 @@ const activePreset = ref('All time')
       <!-- From/To are one control: they wrap as a unit and share a row
            on small screens instead of being split apart. -->
       <div class="flex basis-full items-center gap-2 sm:basis-auto">
-        <label class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+        <label
+          class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5"
+        >
           From
           <input
             v-model="from"
             type="date"
             :max="to || undefined"
-            class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-zinc-300 focus:outline-2 focus:outline-offset-1 focus:outline-forest"
+            class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-zinc-300 focus:outline-2 focus:outline-offset-1 focus:outline-forest sm:w-auto"
             @change="activePreset = ''"
           />
         </label>
-        <label class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+        <label
+          class="flex flex-1 flex-col gap-1 text-sm text-zinc-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5"
+        >
           To
           <input
             v-model="to"
             type="date"
             :min="from || undefined"
-            class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-zinc-300 focus:outline-2 focus:outline-offset-1 focus:outline-forest"
+            class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-zinc-300 focus:outline-2 focus:outline-offset-1 focus:outline-forest sm:w-auto"
             @change="activePreset = ''"
           />
         </label>
@@ -142,7 +153,11 @@ const activePreset = ref('All time')
 
         <div v-if="loading" class="mt-4 h-3 animate-pulse rounded-full bg-zinc-200" />
         <template v-else-if="counts && totalCount > 0">
-          <div class="mt-4 flex h-3 overflow-hidden rounded-full" role="img" :aria-label="`${share('successful')}% successful, ${share('pending')}% pending, ${share('failed')}% failed`">
+          <div
+            class="mt-4 flex h-3 overflow-hidden rounded-full"
+            role="img"
+            :aria-label="`${share('successful')}% successful, ${share('pending')}% pending, ${share('failed')}% failed`"
+          >
             <div class="bg-forest" :style="{ width: `${share('successful')}%` }" />
             <div class="bg-gold" :style="{ width: `${share('pending')}%` }" />
             <div class="bg-clay" :style="{ width: `${share('failed')}%` }" />
@@ -152,21 +167,24 @@ const activePreset = ref('All time')
               <span class="size-2.5 rounded-full bg-forest" aria-hidden="true" />
               <dt class="text-sm text-zinc-500">Successful</dt>
               <dd class="ml-auto text-sm font-semibold text-ink">
-                {{ counts.successful }} <span class="font-normal text-zinc-500">({{ share('successful') }}%)</span>
+                {{ counts.successful }}
+                <span class="font-normal text-zinc-500">({{ share('successful') }}%)</span>
               </dd>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="size-2.5 rounded-full bg-gold" aria-hidden="true" />
               <dt class="text-sm text-zinc-500">Pending</dt>
               <dd class="ml-auto text-sm font-semibold text-ink">
-                {{ counts.pending }} <span class="font-normal text-zinc-500">({{ share('pending') }}%)</span>
+                {{ counts.pending }}
+                <span class="font-normal text-zinc-500">({{ share('pending') }}%)</span>
               </dd>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="size-2.5 rounded-full bg-clay" aria-hidden="true" />
               <dt class="text-sm text-zinc-500">Failed</dt>
               <dd class="ml-auto text-sm font-semibold text-ink">
-                {{ counts.failed }} <span class="font-normal text-zinc-500">({{ share('failed') }}%)</span>
+                {{ counts.failed }}
+                <span class="font-normal text-zinc-500">({{ share('failed') }}%)</span>
               </dd>
             </div>
           </dl>
@@ -196,9 +214,7 @@ const activePreset = ref('All time')
           <h3 class="font-display text-sm font-semibold text-ink group-hover:text-forest-deep">
             Settlement history →
           </h3>
-          <p class="mt-1 text-sm text-zinc-500">
-            Every payout batch with references and dates.
-          </p>
+          <p class="mt-1 text-sm text-zinc-500">Every payout batch with references and dates.</p>
         </RouterLink>
       </div>
     </template>

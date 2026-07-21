@@ -60,6 +60,12 @@ async function loadMerchants(): Promise<void> {
   }
 }
 
+function simulateAnother(): void {
+  phase.value = 'idle'
+  amountInput.value = ''
+  reference.value = generateReference()
+}
+
 function generateReference(): string {
   const random = Array.from({ length: 8 }, () =>
     'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'.charAt(Math.floor(Math.random() * 32)),
@@ -141,14 +147,23 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-  <BaseModal :open="open" title="Simulate customer payment" @close="phase !== 'submitting' && emit('close')">
+  <BaseModal
+    :open="open"
+    title="Simulate customer payment"
+    @close="phase !== 'submitting' && emit('close')"
+  >
     <!-- Result view -->
-    <div v-if="phase === 'done' && result" ref="resultPanel" tabindex="-1" class="text-center outline-none">
+    <div
+      v-if="phase === 'done' && result"
+      ref="resultPanel"
+      tabindex="-1"
+      class="text-center outline-none"
+    >
       <StatusBadge :status="result.status" class="mx-auto" />
-      <p class="font-display mt-3 text-2xl font-semibold text-ink">
+      <p class="mt-3 font-display text-2xl font-semibold text-ink">
         {{ formatMoney(result.gross_amount) }}
       </p>
-      <p class="font-mono mt-1 text-xs text-zinc-500">{{ result.reference }}</p>
+      <p class="mt-1 font-mono text-xs text-zinc-500">{{ result.reference }}</p>
 
       <dl class="mt-4 space-y-1.5 rounded-lg bg-zinc-50 p-4 text-sm">
         <div class="flex justify-between">
@@ -163,7 +178,10 @@ async function submit(): Promise<void> {
           <dt class="font-medium text-ink">
             {{ result.status === 'successful' ? 'Credited to wallet' : 'Would have credited' }}
           </dt>
-          <dd class="font-display font-semibold" :class="result.status === 'successful' ? 'text-forest' : 'text-zinc-500 line-through'">
+          <dd
+            class="font-display font-semibold"
+            :class="result.status === 'successful' ? 'text-forest' : 'text-zinc-500 line-through'"
+          >
             {{ formatMoney(result.net_amount) }}
           </dd>
         </div>
@@ -171,20 +189,13 @@ async function submit(): Promise<void> {
 
       <div class="mt-5 flex justify-center gap-2">
         <BaseButton variant="secondary" @click="emit('close')">Done</BaseButton>
-        <BaseButton @click="phase = 'idle'; amountInput = ''; reference = generateReference()">
-          Simulate another
-        </BaseButton>
+        <BaseButton @click="simulateAnother">Simulate another</BaseButton>
       </div>
     </div>
 
     <!-- Form view -->
     <form v-else class="space-y-4" novalidate @submit.prevent="submit">
-      <BaseSelect
-        v-model="merchantId"
-        label="Merchant"
-        required
-        :error="errors.merchant_id"
-      >
+      <BaseSelect v-model="merchantId" label="Merchant" required :error="errors.merchant_id">
         <option :value="null" disabled>
           {{ merchantsLoading ? 'Loading merchants…' : 'Choose an active merchant…' }}
         </option>
@@ -233,7 +244,10 @@ async function submit(): Promise<void> {
       </dl>
 
       <div class="flex items-center justify-end gap-2 pt-1">
-        <p v-if="phase === 'submitting'" class="mr-auto flex items-center gap-2 text-sm text-zinc-500">
+        <p
+          v-if="phase === 'submitting'"
+          class="mr-auto flex items-center gap-2 text-sm text-zinc-500"
+        >
           <span class="size-1.5 animate-pulse rounded-full bg-gold" aria-hidden="true" />
           Waiting for gateway…
         </p>

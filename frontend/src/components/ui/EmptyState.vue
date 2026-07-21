@@ -25,7 +25,7 @@ withDefaults(
         />
       </svg>
     </div>
-    <component :is="`h${level}`" class="font-display mt-3 text-sm font-semibold text-ink">
+    <component :is="`h${level}`" class="mt-3 font-display text-sm font-semibold text-ink">
       {{ title }}
     </component>
     <p class="mt-1 text-sm text-zinc-500">{{ message }}</p>

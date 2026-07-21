@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Enums\MerchantStatus;
 use App\Models\Institution;
+use App\Models\Merchant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\Merchant>
+ * @extends Factory<Merchant>
  */
 class MerchantFactory extends Factory
 {

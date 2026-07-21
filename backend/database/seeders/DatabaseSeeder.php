@@ -12,6 +12,7 @@ use App\Services\SettlementService;
 use App\Support\Money;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
@@ -53,7 +54,7 @@ class DatabaseSeeder extends Seeder
         }
     }
 
-    /** @return \Illuminate\Support\Collection<int, Merchant> */
+    /** @return Collection<int, Merchant> */
     private function seedMerchants()
     {
         $institutions = Institution::all();

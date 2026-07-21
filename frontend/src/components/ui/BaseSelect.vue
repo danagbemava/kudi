@@ -29,7 +29,7 @@ const id = useId()
           'focus:outline-2 focus:outline-offset-1',
           error
             ? 'border-clay focus:outline-clay'
-            : 'border-field focus:outline-forest hover:border-zinc-500',
+            : 'border-field hover:border-zinc-500 focus:outline-forest',
         ]"
       >
         <slot />

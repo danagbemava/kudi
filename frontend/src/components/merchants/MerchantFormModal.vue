@@ -38,7 +38,9 @@ watch(
         account_number: '',
       }
       errors.value = {}
-      merchants.fetchInstitutions().catch(() => toast.error('Could not load bank list. Reopen to retry.'))
+      merchants
+        .fetchInstitutions()
+        .catch(() => toast.error('Could not load bank list. Reopen to retry.'))
     }
   },
 )
