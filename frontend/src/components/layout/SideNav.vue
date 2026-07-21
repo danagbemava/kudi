@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import KudiLogo from '../ui/KudiLogo.vue'
 
+// SideNav renders twice (desktop aside + mobile drawer), so the id is passed in
+// by whichever instance the menu button actually controls — hard-coding it here
+// would put a duplicate id in the DOM.
+defineProps<{ navId?: string }>()
+
 const emit = defineEmits<{ navigate: [] }>()
 
 const ACTIVE = '!bg-white/10 !text-white'
@@ -43,7 +48,7 @@ const items = [
       <KudiLogo light />
     </div>
 
-    <nav id="main-nav" class="flex-1 space-y-1 px-3 py-4" aria-label="Main navigation">
+    <nav :id="navId" class="flex-1 space-y-1 px-3 py-4" aria-label="Main navigation">
       <RouterLink
         v-for="item in items"
         :key="item.to"
@@ -68,9 +73,9 @@ const items = [
     </nav>
 
     <div class="border-t border-white/10 px-5 py-4">
-      <p class="text-[11px] leading-relaxed text-slate-400">
+      <p class="text-[11px] leading-relaxed text-slate-300">
         Merchant Wallet &amp; Settlement<br />
-        <span class="text-slate-500">Demo environment</span>
+        <span class="text-slate-400">Demo environment</span>
       </p>
     </div>
   </div>

@@ -95,7 +95,7 @@ const columns = ['Reference', 'Batch', 'Merchant', 'Amount', 'Settled at']
           v-model="from"
           type="date"
           :max="to || undefined"
-          class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
         />
       </label>
       <label class="flex items-center gap-1.5 text-sm text-slate-500">
@@ -104,13 +104,15 @@ const columns = ['Reference', 'Batch', 'Merchant', 'Amount', 'Settled at']
           v-model="to"
           type="date"
           :min="from || undefined"
-          class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
         />
       </label>
     </div>
 
     <DataTable
       :columns="columns"
+      label="Settlements"
+      :count="settlements.items.length"
       :loading="settlements.loading"
       :error="settlements.error"
       :empty="settlements.items.length === 0"

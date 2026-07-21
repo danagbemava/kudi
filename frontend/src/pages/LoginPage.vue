@@ -42,7 +42,7 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-canvas px-4">
+  <main class="flex min-h-screen items-center justify-center bg-canvas px-4">
     <div class="w-full max-w-sm">
       <div class="mb-8 text-center">
         <h1><KudiLogo class="text-2xl" /></h1>
@@ -78,5 +78,5 @@ async function submit(): Promise<void> {
         </form>
       </div>
     </div>
-  </div>
+  </main>
 </template>

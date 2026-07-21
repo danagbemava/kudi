@@ -69,10 +69,16 @@ Targeting WCAG 2.1 AA. Audited by hand across contrast, keyboard operability, fo
 - **Contrast** — every text/background pair was measured, not eyeballed. Secondary text on light surfaces uses `slate-500` (4.76:1); the same role on the dark hero cards uses `slate-400` (6.7:1), because `slate-500` there would fall to 3.6:1 and fail. Disabled controls are exempt per SC 1.4.3.
 - **Keyboard** — skip-to-content link, visible focus rings on every interactive element, focus trapped in dialogs and restored to the trigger on close. The mobile nav drawer is a real dialog: Escape closes it, focus moves in and returns.
 - **Forms** — every control has a bound `<label>`; server validation maps to per-field messages tied via `aria-describedby` with `aria-invalid`, and errors announce through `role="alert"`.
-- **Screen readers** — route changes announce through a live region (SPA navigation is otherwise silent), the payment fee preview is an `aria-live` region so the net figure is spoken as it changes, and the volume chart carries a text summary because a `<canvas>` exposes nothing to assistive tech.
+- **Status messages** — route changes, result counts after filtering, and load failures all announce through live regions; SPA navigation and in-place table swaps are otherwise silent. The payment fee breakdown announces once, ~700ms after typing stops, rather than interrupting on every keystroke of the amount. Error toasts never auto-dismiss, and hovering or focusing a toast pauses its timer (SC 2.2.1).
+- **Non-text content** — the volume chart carries a text summary naming the total and busiest day, because a `<canvas>` exposes nothing to assistive tech; every decorative icon is `aria-hidden`; status is never conveyed by colour alone (badges print the status word).
 - **Motion** — `prefers-reduced-motion` disables animation and transitions globally.
 
-Known gaps: no automated axe/Lighthouse run (would be the next step in CI), and the tables are not sortable so no sort-state announcement is needed yet.
+Two findings worth calling out, because they are invisible in a static reading of the markup:
+
+- `BaseModal` listens for keys on `window`, not on the dialog element. A submit button that disables itself while loading makes browsers reset focus to `<body>`, at which point an element-bound handler stops receiving events — silently disabling both Escape and the focus trap. There is a regression test for this.
+- Form-control borders use a dedicated `--color-field` token at 3.4:1 rather than the decorative `--color-line` (1.23:1). SC 1.4.11 governs the boundary that identifies a control, and a near-white border on a near-white page fails it; card edges and dividers are decorative and correctly stay light.
+
+Known gaps: no automated axe/Lighthouse run (the next step, ideally in CI), and the mobile drawer relies on `inert`, which needs a polyfill below Safari 15.5.
 
 ## Assumptions
 

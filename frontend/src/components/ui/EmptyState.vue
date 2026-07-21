@@ -1,8 +1,14 @@
 <script setup lang="ts">
-defineProps<{
-  title: string
-  message: string
-}>()
+// Heading level is caller-supplied so the empty state slots into the
+// surrounding document outline instead of always jumping to h3.
+withDefaults(
+  defineProps<{
+    title: string
+    message: string
+    level?: 2 | 3 | 4
+  }>(),
+  { level: 2 },
+)
 </script>
 
 <template>
@@ -19,7 +25,9 @@ defineProps<{
         />
       </svg>
     </div>
-    <h3 class="font-display mt-3 text-sm font-semibold text-ink">{{ title }}</h3>
+    <component :is="`h${level}`" class="font-display mt-3 text-sm font-semibold text-ink">
+      {{ title }}
+    </component>
     <p class="mt-1 text-sm text-slate-500">{{ message }}</p>
     <div v-if="$slots.action" class="mt-4">
       <slot name="action" />

@@ -64,14 +64,14 @@ const columns = ['Business', 'Contact', 'Institution', 'Wallet balance', 'Status
           type="search"
           placeholder="Search merchants…"
           aria-label="Search merchants"
-          class="w-full rounded-lg border border-line bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-500 hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          class="w-full rounded-lg border border-field bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-500 hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
         />
       </div>
 
       <select
         v-model="status"
         aria-label="Filter by status"
-        class="rounded-lg border border-line bg-white px-3 py-2 text-sm hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+        class="rounded-lg border border-field bg-white px-3 py-2 text-sm hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
       >
         <option value="">All statuses</option>
         <option value="active">Active</option>
@@ -83,6 +83,8 @@ const columns = ['Business', 'Contact', 'Institution', 'Wallet balance', 'Status
 
     <DataTable
       :columns="columns"
+      label="Merchants"
+      :count="merchants.items.length"
       :loading="merchants.loading"
       :error="merchants.error"
       :empty="merchants.items.length === 0"

@@ -79,7 +79,7 @@ async function toggleStatus(): Promise<void> {
       v-else-if="merchants.detailError"
       class="rounded-xl border border-line bg-white px-6 py-16 text-center"
     >
-      <p class="text-sm text-slate-600">{{ merchants.detailError }}</p>
+      <p class="text-sm text-slate-600" role="alert">{{ merchants.detailError }}</p>
       <BaseButton variant="secondary" class="mt-4" @click="load">Retry</BaseButton>
     </div>
 
@@ -146,6 +146,7 @@ async function toggleStatus(): Promise<void> {
           <div class="overflow-hidden rounded-xl border border-line bg-white">
             <div v-if="merchant.recent_transactions.length === 0" class="px-4 py-10">
               <EmptyState
+                :level="4"
                 title="No transactions"
                 message="Payments to this merchant will appear here."
               />
@@ -177,6 +178,7 @@ async function toggleStatus(): Promise<void> {
           <div class="overflow-hidden rounded-xl border border-line bg-white">
             <div v-if="merchant.recent_settlements.length === 0" class="px-4 py-10">
               <EmptyState
+                :level="4"
                 title="No settlements yet"
                 message="Run a settlement to pay out this merchant's balance."
               />

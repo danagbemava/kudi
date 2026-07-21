@@ -29,19 +29,28 @@ function onDrawerKeydown(event: KeyboardEvent): void {
 }
 
 // The drawer covers the page on small screens, so it needs the same keyboard
-// contract as a dialog: Escape closes it, focus moves in, focus comes back.
+// contract as a dialog: Escape closes it, focus moves in, focus comes back, and
+// the page behind is unreachable. The drawer is teleported to <body>, so marking
+// the app root inert traps focus without hand-rolling a Tab cycle.
 watch(drawerOpen, async (open) => {
+  const appRoot = document.getElementById('app')
+
   if (open) {
     window.addEventListener('keydown', onDrawerKeydown)
+    appRoot?.setAttribute('inert', '')
     await nextTick()
     drawerPanel.value?.querySelector('a')?.focus()
   } else {
     window.removeEventListener('keydown', onDrawerKeydown)
+    appRoot?.removeAttribute('inert')
     menuButton.value?.focus()
   }
 })
 
-onBeforeUnmount(() => window.removeEventListener('keydown', onDrawerKeydown))
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onDrawerKeydown)
+  document.getElementById('app')?.removeAttribute('inert')
+})
 
 async function logout(): Promise<void> {
   try {
@@ -90,7 +99,7 @@ async function logout(): Promise<void> {
         >
           <div class="absolute inset-0 bg-ink/50" @click="drawerOpen = false" />
           <div ref="drawerPanel" class="absolute inset-y-0 left-0 w-64 shadow-xl">
-            <SideNav @navigate="drawerOpen = false" />
+            <SideNav nav-id="main-nav" @navigate="drawerOpen = false" />
             <button
               type="button"
               class="absolute top-4 right-3 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-primary-500"

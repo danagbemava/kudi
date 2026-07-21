@@ -67,14 +67,14 @@ const hasFilters = () => Boolean(search.value || status.value || from.value || t
           type="search"
           placeholder="Search reference…"
           aria-label="Search by payment reference"
-          class="w-full rounded-lg border border-line bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-500 hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          class="w-full rounded-lg border border-field bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-500 hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
         />
       </div>
 
       <select
         v-model="status"
         aria-label="Filter by status"
-        class="rounded-lg border border-line bg-white px-3 py-2 text-sm hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+        class="rounded-lg border border-field bg-white px-3 py-2 text-sm hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
       >
         <option value="">All statuses</option>
         <option value="successful">Successful</option>
@@ -88,7 +88,7 @@ const hasFilters = () => Boolean(search.value || status.value || from.value || t
           v-model="from"
           type="date"
           :max="to || undefined"
-          class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
         />
       </label>
       <label class="flex items-center gap-1.5 text-sm text-slate-500">
@@ -97,7 +97,7 @@ const hasFilters = () => Boolean(search.value || status.value || from.value || t
           v-model="to"
           type="date"
           :min="from || undefined"
-          class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
         />
       </label>
 
@@ -106,6 +106,8 @@ const hasFilters = () => Boolean(search.value || status.value || from.value || t
 
     <DataTable
       :columns="columns"
+      label="Transactions"
+      :count="transactions.items.length"
       :loading="transactions.loading"
       :error="transactions.error"
       :empty="transactions.items.length === 0"

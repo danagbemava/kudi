@@ -23,7 +23,7 @@ onMounted(() => {
       v-if="dashboard.error"
       class="rounded-xl border border-line bg-white px-6 py-16 text-center"
     >
-      <p class="text-sm text-slate-600">{{ dashboard.error }}</p>
+      <p class="text-sm text-slate-600" role="alert">{{ dashboard.error }}</p>
       <BaseButton variant="secondary" class="mt-4" @click="dashboard.fetch()">Retry</BaseButton>
     </div>
 
@@ -100,6 +100,7 @@ onMounted(() => {
             class="px-4 py-12"
           >
             <EmptyState
+              :level="3"
               title="No transactions yet"
               message="Simulate a customer payment to see it appear here."
             >

@@ -1,18 +1,31 @@
 <script setup lang="ts">
 import { useToast } from '../../composables/useToast'
 
-const { toasts, dismiss } = useToast()
+const { toasts, dismiss, hold, resume } = useToast()
 
 const tones = {
-  success: 'border-green-200 bg-green-50 text-green-800',
-  error: 'border-red-200 bg-red-50 text-red-800',
-  info: 'border-line bg-white text-ink',
+  success: {
+    panel: 'border-green-200 bg-green-50 text-green-800',
+    close: 'text-green-800 hover:bg-green-100',
+  },
+  error: {
+    panel: 'border-red-200 bg-red-50 text-red-800',
+    close: 'text-red-800 hover:bg-red-100',
+  },
+  info: {
+    panel: 'border-line bg-white text-ink',
+    close: 'text-slate-600 hover:bg-slate-100',
+  },
 }
 </script>
 
 <template>
+  <!-- One live region on the container only. Putting role="status" on each toast
+       as well would nest live regions and pull the dismiss button's name into
+       the announcement. -->
   <div
     class="pointer-events-none fixed inset-x-4 bottom-4 z-[60] flex flex-col items-center gap-2 sm:inset-x-auto sm:right-6 sm:items-end"
+    role="status"
     aria-live="polite"
   >
     <TransitionGroup
@@ -26,14 +39,20 @@ const tones = {
         :key="toast.id"
         :class="[
           'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border px-4 py-3 text-sm shadow-lg',
-          tones[toast.tone],
+          tones[toast.tone].panel,
         ]"
-        role="status"
+        @mouseenter="hold(toast.id)"
+        @mouseleave="resume(toast.id, toast.tone)"
+        @focusin="hold(toast.id)"
+        @focusout="resume(toast.id, toast.tone)"
       >
         <p class="flex-1">{{ toast.message }}</p>
         <button
           type="button"
-          class="shrink-0 opacity-50 transition-opacity hover:opacity-100 focus-visible:outline-2 focus-visible:outline-current"
+          :class="[
+            'shrink-0 rounded-md p-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-current',
+            tones[toast.tone].close,
+          ]"
           aria-label="Dismiss notification"
           @click="dismiss(toast.id)"
         >

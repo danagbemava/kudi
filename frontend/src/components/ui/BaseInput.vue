@@ -22,7 +22,7 @@ const id = useId()
   <div>
     <label :for="id" class="mb-1.5 block text-sm font-medium text-ink">
       {{ label }}
-      <span v-if="required" class="text-red-500" aria-hidden="true">*</span>
+      <span v-if="required" class="text-red-600" aria-hidden="true">*</span>
     </label>
     <div class="relative">
       <span
@@ -45,7 +45,7 @@ const id = useId()
           prefix ? 'pl-12' : '',
           error
             ? 'border-red-400 focus:outline-red-500'
-            : 'border-line focus:outline-primary-600 hover:border-slate-300',
+            : 'border-field focus:outline-primary-600 hover:border-slate-500',
         ]"
       />
     </div>

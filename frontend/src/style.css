@@ -11,7 +11,13 @@
   --color-canvas: #f8fafc;
   --color-ink: #0f172a;
   --color-ink-soft: #1e293b;
+
+  /* Decorative dividers and card edges. */
   --color-line: #e2e8f0;
+  /* Form-control boundaries. WCAG 1.4.11 wants 3:1 for the edge that identifies
+     a control; --color-line is only 1.23:1 against a white field, which makes an
+     input indistinguishable from the page. This measures 3.4:1. */
+  --color-field: #808c9f;
 
   --color-primary-50: #eef2ff;
   --color-primary-100: #e0e7ff;

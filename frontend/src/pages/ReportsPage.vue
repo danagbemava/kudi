@@ -89,7 +89,7 @@ const activePreset = ref('All time')
           v-model="from"
           type="date"
           :max="to || undefined"
-          class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
           @change="activePreset = ''"
         />
       </label>
@@ -99,14 +99,14 @@ const activePreset = ref('All time')
           v-model="to"
           type="date"
           :min="from || undefined"
-          class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
           @change="activePreset = ''"
         />
       </label>
     </div>
 
     <div v-if="error" class="rounded-xl border border-line bg-white px-6 py-16 text-center">
-      <p class="text-sm text-slate-600">{{ error }}</p>
+      <p class="text-sm text-slate-600" role="alert">{{ error }}</p>
       <BaseButton variant="secondary" class="mt-4" @click="load">Retry</BaseButton>
     </div>
 
@@ -176,7 +176,7 @@ const activePreset = ref('All time')
       <div class="mt-6 grid gap-4 sm:grid-cols-2">
         <RouterLink
           to="/transactions"
-          class="group rounded-xl border border-line bg-white p-5 transition-colors hover:border-primary-300 focus-visible:outline-2 focus-visible:outline-primary-600"
+          class="group rounded-xl border border-line bg-white p-5 transition-colors hover:border-primary-500 focus-visible:outline-2 focus-visible:outline-primary-600"
         >
           <h3 class="font-display text-sm font-semibold text-ink group-hover:text-primary-700">
             Transaction history →
@@ -187,7 +187,7 @@ const activePreset = ref('All time')
         </RouterLink>
         <RouterLink
           to="/settlements"
-          class="group rounded-xl border border-line bg-white p-5 transition-colors hover:border-primary-300 focus-visible:outline-2 focus-visible:outline-primary-600"
+          class="group rounded-xl border border-line bg-white p-5 transition-colors hover:border-primary-500 focus-visible:outline-2 focus-visible:outline-primary-600"
         >
           <h3 class="font-display text-sm font-semibold text-ink group-hover:text-primary-700">
             Settlement history →

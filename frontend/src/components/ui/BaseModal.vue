@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -13,6 +13,8 @@ const props = withDefaults(
 const emit = defineEmits<{ close: [] }>()
 
 const panel = ref<HTMLElement | null>(null)
+const titleId = useId()
+const bodyId = useId()
 let previouslyFocused: HTMLElement | null = null
 
 watch(
@@ -20,13 +22,22 @@ watch(
   async (open) => {
     if (open) {
       previouslyFocused = document.activeElement as HTMLElement
+      // Listen on window, not the overlay: a button that disables itself while
+      // loading drops focus to <body>, and a handler bound to the overlay would
+      // then never fire — silently killing both Escape and the focus trap.
+      window.addEventListener('keydown', onKeydown)
       await nextTick()
       focusFirst()
     } else {
+      window.removeEventListener('keydown', onKeydown)
       previouslyFocused?.focus()
     }
   },
+  // immediate, so a dialog that mounts already-open still gets its key handler.
+  { immediate: true },
 )
+
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
 function focusFirst(): void {
   const target = panel.value?.querySelector<HTMLElement>(
@@ -49,6 +60,14 @@ function onKeydown(event: KeyboardEvent): void {
       'input, select, textarea, button, a[href], [tabindex]:not([tabindex="-1"])',
     ),
   ].filter((el) => !el.hasAttribute('disabled'))
+
+  // Focus may have been dropped to <body> (e.g. by a button disabling itself),
+  // in which case Tab must be pulled back into the dialog rather than ignored.
+  if (!panel.value.contains(document.activeElement)) {
+    event.preventDefault()
+    focusables[0]?.focus()
+    return
+  }
 
   if (focusables.length === 0) return
 
@@ -77,13 +96,13 @@ function onKeydown(event: KeyboardEvent): void {
         v-if="open"
         class="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 backdrop-blur-[2px] sm:items-center"
         @click.self="emit('close')"
-        @keydown="onKeydown"
       >
         <div
           ref="panel"
           role="dialog"
           aria-modal="true"
-          :aria-label="title"
+          :aria-labelledby="titleId"
+          :aria-describedby="bodyId"
           tabindex="-1"
           :class="[
             'w-full rounded-2xl bg-white shadow-xl outline-none',
@@ -91,7 +110,7 @@ function onKeydown(event: KeyboardEvent): void {
           ]"
         >
           <div class="flex items-center justify-between border-b border-line px-5 py-4">
-            <h2 class="font-display text-base font-semibold text-ink">{{ title }}</h2>
+            <h2 :id="titleId" class="font-display text-base font-semibold text-ink">{{ title }}</h2>
             <button
               type="button"
               data-modal-close
@@ -106,7 +125,7 @@ function onKeydown(event: KeyboardEvent): void {
               </svg>
             </button>
           </div>
-          <div class="px-5 py-4">
+          <div :id="bodyId" class="px-5 py-4">
             <slot />
           </div>
         </div>

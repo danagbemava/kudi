@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { api } from '../../api'
 import { ApiValidationError, toApiError } from '../../api/client'
 import type { Merchant, Transaction } from '../../api/types'
@@ -67,11 +67,28 @@ function generateReference(): string {
   return `PAY-${random}`
 }
 
+const resultPanel = ref<HTMLElement | null>(null)
+
 const amountMinor = computed(() => parseAmount(amountInput.value))
 const fee = computed(() => (amountMinor.value !== null ? feeFor(amountMinor.value) : null))
 const net = computed(() =>
   amountMinor.value !== null && fee.value !== null ? amountMinor.value - fee.value : null,
 )
+
+// Announced once the user stops typing. Marking the whole breakdown aria-live
+// would interrupt them on every keystroke of the amount.
+const feeAnnouncement = ref('')
+let feeTimer: ReturnType<typeof setTimeout> | undefined
+
+watch([amountMinor, fee, net], () => {
+  clearTimeout(feeTimer)
+  feeTimer = setTimeout(() => {
+    feeAnnouncement.value =
+      amountMinor.value === null || fee.value === null || net.value === null
+        ? ''
+        : `Fee ${formatMoney(fee.value)}, net wallet credit ${formatMoney(net.value)}.`
+  }, 700)
+})
 
 const amountError = computed(() => {
   if (amountInput.value === '' || amountMinor.value !== null) return errors.value.amount
@@ -97,6 +114,11 @@ async function submit(): Promise<void> {
     phase.value = 'done'
     emit('completed')
 
+    // The submit button disabled itself while loading, which drops focus to
+    // <body>; pull it into the result so the dialog keeps the focus.
+    await nextTick()
+    resultPanel.value?.focus()
+
     if (result.value.status === 'successful') {
       toast.success(`Payment settled to wallet — ${formatMoney(result.value.net_amount)} credited.`)
     } else {
@@ -121,7 +143,7 @@ async function submit(): Promise<void> {
 <template>
   <BaseModal :open="open" title="Simulate customer payment" @close="phase !== 'submitting' && emit('close')">
     <!-- Result view -->
-    <div v-if="phase === 'done' && result" class="text-center">
+    <div v-if="phase === 'done' && result" ref="resultPanel" tabindex="-1" class="text-center outline-none">
       <StatusBadge :status="result.status" class="mx-auto" />
       <p class="font-display mt-3 text-2xl font-semibold text-ink">
         {{ formatMoney(result.gross_amount) }}
@@ -141,7 +163,7 @@ async function submit(): Promise<void> {
           <dt class="font-medium text-ink">
             {{ result.status === 'successful' ? 'Credited to wallet' : 'Would have credited' }}
           </dt>
-          <dd class="font-display font-semibold" :class="result.status === 'successful' ? 'text-green-600' : 'text-slate-500 line-through'">
+          <dd class="font-display font-semibold" :class="result.status === 'successful' ? 'text-green-700' : 'text-slate-500 line-through'">
             {{ formatMoney(result.net_amount) }}
           </dd>
         </div>
@@ -188,11 +210,10 @@ async function submit(): Promise<void> {
         hint="Prefilled with a unique reference — edit if you need a specific one."
       />
 
+      <p class="sr-only" role="status">{{ feeAnnouncement }}</p>
+
       <!-- Live fee preview -->
-      <dl
-        class="space-y-1.5 rounded-lg bg-slate-50 p-4 text-sm"
-        aria-live="polite"
-      >
+      <dl class="space-y-1.5 rounded-lg bg-slate-50 p-4 text-sm">
         <div class="flex justify-between">
           <dt class="text-slate-500">Gross amount</dt>
           <dd class="font-medium text-ink">

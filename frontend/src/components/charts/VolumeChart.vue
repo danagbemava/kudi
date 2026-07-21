@@ -82,14 +82,14 @@ const options = {
   scales: {
     x: {
       grid: { display: false },
-      ticks: { maxTicksLimit: 6, color: '#94a3b8', font: { size: 11 } },
+      ticks: { maxTicksLimit: 6, color: '#475569', font: { size: 11 } },
     },
     y: {
       border: { display: false },
       grid: { color: '#f1f5f9' },
       ticks: {
         maxTicksLimit: 5,
-        color: '#94a3b8',
+        color: '#475569',
         font: { size: 11 },
         callback: (value: string | number) => formatMoneyCompact(Number(value)),
       },
@@ -105,7 +105,7 @@ const options = {
         :data="data"
         :options="options"
         role="img"
-        :aria-label="summary"
+        aria-label="Payment volume chart"
       />
     </div>
     <!-- A canvas exposes nothing to assistive tech, so restate the series as
