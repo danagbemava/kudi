@@ -38,7 +38,7 @@ Open **http://localhost:5173** — the Vite dev server proxies API calls to Lara
 
 ```bash
 cd backend && php artisan test    # 43 tests — business rules, API, auth
-cd frontend && npm test           # 15 tests — money math, components, stores
+cd frontend && npm test           # 25 tests — money math, components, stores, nav
 cd frontend && npm run lint       # ESLint, incl. vue/no-undef-components
 cd frontend && npm run format:check   # Prettier, incl. Tailwind class order
 cd backend  && composer format:check  # Laravel Pint
@@ -79,14 +79,14 @@ The interface is built around the settlement cycle rather than around a grid of 
 - **Pending payments never touch wallets.** They credit only when processed; a settlement run between creation and processing simply leaves them for the next batch.
 - **Race-safe processing.** The gateway callback endpoint re-checks the transaction status under a row lock inside the transaction, so two concurrent callbacks cannot double-credit a wallet.
 - **A banks/mobile-money reference table** replaces the brief's free-text "bank name": merchants register against a seeded list of Ghanaian banks and mobile money providers (MTN MoMo, Telecel Cash, AT Money), which eliminates typos and mirrors real settlement rails. (Deviation from the brief's literal field list, chosen deliberately.)
-- **SPA + API, same-origin cookies.** The Vite dev server and the Docker nginx both proxy `/api`, `/login`, `/logout`, and `/sanctum` to Laravel, so the Sanctum session cookie is always first-party — no cross-origin cookie fragility.
+- **SPA + API, same-origin cookies.** The Vite dev server and the Docker nginx both proxy `/api` and `/sanctum` to Laravel (auth lives at `/api/login`, so the SPA keeps the `/login` page), so the Sanctum session cookie is always first-party — no cross-origin cookie fragility.
 - **State management** is Pinia stores per domain (auth, dashboard, merchants, transactions, settlements) over a typed API client with a single error-normalization path: 422s map to field errors, everything else to toast-able messages.
 
 ## Accessibility
 
 Targeting WCAG 2.1 AA. Audited by hand across contrast, keyboard operability, forms, ARIA, landmarks, and SPA-specific concerns.
 
-- **Contrast** — every text/background pair was measured, not eyeballed. Secondary text on light surfaces uses `slate-500` (4.76:1); the same role on the dark hero cards uses `slate-400` (6.7:1), because `slate-500` there would fall to 3.6:1 and fail. Disabled controls are exempt per SC 1.4.3.
+- **Contrast** — every text/background pair was measured, not eyeballed. Secondary text on light surfaces uses `zinc-500` (4.8:1); the same role on the dark hero uses `zinc-400` (7.1:1), because `zinc-500` there would fall to 3.6:1 and fail. Gold carries dark text only — white on gold measures 2.2:1. Disabled controls are exempt per SC 1.4.3.
 - **Keyboard** — skip-to-content link, visible focus rings on every interactive element, focus trapped in dialogs and restored to the trigger on close. The mobile nav drawer is a real dialog: Escape closes it, focus moves in and returns.
 - **Forms** — every control has a bound `<label>`; server validation maps to per-field messages tied via `aria-describedby` with `aria-invalid`, and errors announce through `role="alert"`.
 - **Status messages** — route changes, result counts after filtering, and load failures all announce through live regions; SPA navigation and in-place table swaps are otherwise silent. The payment fee breakdown announces once, ~700ms after typing stops, rather than interrupting on every keystroke of the amount. Error toasts never auto-dismiss, and hovering or focusing a toast pauses its timer (SC 2.2.1).
@@ -97,6 +97,8 @@ Two findings worth calling out, because they are invisible in a static reading o
 
 - `BaseModal` listens for keys on `window`, not on the dialog element. A submit button that disables itself while loading makes browsers reset focus to `<body>`, at which point an element-bound handler stops receiving events — silently disabling both Escape and the focus trap. There is a regression test for this.
 - Form-control borders use a dedicated `--color-field` token at 3.4:1 rather than the decorative `--color-line` (1.23:1). SC 1.4.11 governs the boundary that identifies a control, and a near-white border on a near-white page fails it; card edges and dividers are decorative and correctly stay light.
+
+Contrast was re-audited in the browser after the palette change, resolving colours through a canvas because Tailwind v4 emits `oklab()` that string parsing misreads — 51–110 elements per route, every failure fixed.
 
 Known gaps: no automated axe/Lighthouse run (the next step, ideally in CI), and the mobile drawer relies on `inert`, which needs a polyfill below Safari 15.5.
 
