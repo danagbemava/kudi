@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { toApiError } from '../api/client'
-import BaseButton from '../components/ui/BaseButton.vue'
-import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
+import RunSettlementButton from '../components/settlements/RunSettlementButton.vue'
 import DataTable from '../components/ui/DataTable.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
 import FilterBar from '../components/ui/FilterBar.vue'
 import PaginationBar from '../components/ui/PaginationBar.vue'
-import { useToast } from '../composables/useToast'
 import { useDashboardStore } from '../stores/dashboard'
 import { useSettlementsStore } from '../stores/settlements'
 import { formatDateTime } from '../utils/dates'
@@ -15,12 +12,10 @@ import { formatMoney } from '../utils/money'
 
 const settlements = useSettlementsStore()
 const dashboard = useDashboardStore()
-const toast = useToast()
 
 const from = ref('')
 const to = ref('')
 const page = ref(1)
-const confirmOpen = ref(false)
 
 function load(): void {
   settlements.fetch({ from: from.value, to: to.value, page: page.value })
@@ -39,21 +34,6 @@ watch([from, to], () => {
 watch(page, load)
 
 const outstanding = computed(() => dashboard.data?.totals.wallet_balance ?? 0)
-
-async function runSettlement(): Promise<void> {
-  try {
-    const result = await settlements.run()
-    confirmOpen.value = false
-    toast.success(
-      `Settled ${formatMoney(result.total_amount)} to ${result.merchant_count} ` +
-        `${result.merchant_count === 1 ? 'merchant' : 'merchants'} (${result.batch_ref}).`,
-    )
-    dashboard.fetch()
-  } catch (error) {
-    confirmOpen.value = false
-    toast.error(toApiError(error).message)
-  }
-}
 
 const columns = ['Reference', 'Batch', 'Merchant', 'Amount', 'Settled at']
 
@@ -89,13 +69,7 @@ function clearFilters(): void {
               }}
             </p>
           </div>
-          <BaseButton
-            :disabled="dashboard.loading || outstanding === 0"
-            :loading="settlements.running"
-            @click="confirmOpen = true"
-          >
-            Run settlement
-          </BaseButton>
+          <RunSettlementButton @settled="load" />
         </div>
       </div>
     </div>
@@ -203,17 +177,5 @@ function clearFilters(): void {
     </DataTable>
 
     <PaginationBar v-if="settlements.meta" :meta="settlements.meta" @page="page = $event" />
-
-    <ConfirmDialog
-      :open="confirmOpen"
-      title="Run daily settlement"
-      confirm-label="Settle balances"
-      :loading="settlements.running"
-      @close="confirmOpen = false"
-      @confirm="runSettlement"
-    >
-      This moves <strong>{{ formatMoney(outstanding) }}</strong> in outstanding wallet balances to
-      settlement records and resets each settled wallet to zero. Pending payments are not affected.
-    </ConfirmDialog>
   </div>
 </template>

@@ -4,6 +4,7 @@ import VolumeChart from '../components/charts/VolumeChart.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
 import SettlementBand from '../components/dashboard/SettlementBand.vue'
+import RunSettlementButton from '../components/settlements/RunSettlementButton.vue'
 import StatCard from '../components/ui/StatCard.vue'
 import StatusBadge from '../components/ui/StatusBadge.vue'
 import { useDashboardStore } from '../stores/dashboard'
@@ -43,14 +44,25 @@ onMounted(() => {
               {{ formatMoney(dashboard.data?.totals.wallet_balance ?? 0) }}
             </p>
             <p class="mt-1.5 text-sm text-zinc-300">
-              held across {{ dashboard.data?.unsettled.length ?? '—' }} of
-              {{ dashboard.data?.totals.merchant_count ?? '—' }} merchants
+              <template v-if="dashboard.data && dashboard.data.totals.wallet_balance === 0">
+                Every wallet is cleared — nothing is waiting to settle.
+              </template>
+              <template v-else>
+                held across {{ dashboard.data?.unsettled.length ?? '—' }} of
+                {{ dashboard.data?.totals.merchant_count ?? '—' }} merchants
+              </template>
             </p>
           </div>
 
-          <RouterLink to="/settlements" class="shrink-0">
-            <BaseButton>Run settlement</BaseButton>
-          </RouterLink>
+          <div class="flex shrink-0 items-center gap-3">
+            <RouterLink
+              to="/settlements"
+              class="text-sm font-medium text-gold underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+            >
+              Settlement history
+            </RouterLink>
+            <RunSettlementButton @settled="dashboard.fetch()" />
+          </div>
         </div>
 
         <SettlementBand
