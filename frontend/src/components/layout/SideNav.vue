@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import KudiLogo from '../ui/KudiLogo.vue'
+
+const route = useRoute()
 
 // SideNav renders twice (desktop aside + mobile drawer), so the id is passed in
 // by whichever instance the menu button actually controls — hard-coding it here
@@ -8,7 +11,19 @@ defineProps<{ navId?: string }>()
 
 const emit = defineEmits<{ navigate: [] }>()
 
-const ACTIVE = '!bg-white/10 !text-white'
+const ACTIVE = 'bg-white/10 text-white'
+
+/**
+ * Highlighting is computed from the path rather than left to RouterLink's
+ * active-class. Detail routes like /merchants/:id are registered as siblings
+ * of /merchants, not children, and RouterLink derives activeness from matched
+ * route records — so it does not treat the section link as active on a detail
+ * page and the nav loses its place.
+ */
+function isActive(item: { to: string; exact?: boolean }): boolean {
+  if (item.exact) return route.path === item.to
+  return route.path === item.to || route.path.startsWith(`${item.to}/`)
+}
 
 const items = [
   {
@@ -53,9 +68,11 @@ const items = [
         v-for="item in items"
         :key="item.to"
         :to="item.to"
-        class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-        :active-class="item.exact ? undefined : ACTIVE"
-        :exact-active-class="ACTIVE"
+        :class="[
+          'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+          isActive(item) ? ACTIVE : 'text-slate-300 hover:bg-white/5 hover:text-white',
+        ]"
+        :aria-current="isActive(item) ? 'page' : undefined"
         @click="emit('navigate')"
       >
         <svg
