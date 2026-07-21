@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const props = defineProps<{
-  status: 'pending' | 'successful' | 'failed' | 'active' | 'inactive'
-}>()
+type Status = 'pending' | 'successful' | 'failed' | 'active' | 'inactive'
 
-const tones: Record<typeof props.status, { chip: string; dot: string }> = {
+defineProps<{ status: Status }>()
+
+const tones: Record<Status, { chip: string; dot: string }> = {
   successful: { chip: 'bg-green-50 text-green-700 ring-green-600/20', dot: 'bg-green-500' },
   active: { chip: 'bg-green-50 text-green-700 ring-green-600/20', dot: 'bg-green-500' },
   pending: { chip: 'bg-amber-50 text-amber-700 ring-amber-600/20', dot: 'bg-amber-500' },

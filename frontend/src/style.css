@@ -39,6 +39,12 @@
   );
 }
 
+/* Always reserve the scrollbar's width so pages that differ in height
+   don't reflow horizontally when the scrollbar appears or disappears. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   font-family: var(--font-sans);
   background: var(--color-canvas);
