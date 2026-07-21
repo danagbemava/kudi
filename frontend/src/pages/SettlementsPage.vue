@@ -5,6 +5,7 @@ import BaseButton from '../components/ui/BaseButton.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import DataTable from '../components/ui/DataTable.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
+import FilterBar from '../components/ui/FilterBar.vue'
 import PaginationBar from '../components/ui/PaginationBar.vue'
 import { useToast } from '../composables/useToast'
 import { useDashboardStore } from '../stores/dashboard'
@@ -55,6 +56,13 @@ async function runSettlement(): Promise<void> {
 }
 
 const columns = ['Reference', 'Batch', 'Merchant', 'Amount', 'Settled at']
+
+const activeFilterCount = computed(() => [from.value, to.value].filter(Boolean).length)
+
+function clearFilters(): void {
+  from.value = ''
+  to.value = ''
+}
 </script>
 
 <template>
@@ -92,30 +100,32 @@ const columns = ['Reference', 'Batch', 'Merchant', 'Amount', 'Settled at']
       </div>
     </div>
 
-    <div class="sticky top-16 z-20 -mx-4 mb-4 flex flex-wrap items-center gap-3 border-b border-line bg-canvas px-4 py-3 sm:static sm:mx-0 sm:border-0 sm:px-0 sm:py-0">
-      <!-- From/To are one control: they wrap as a unit and share a row
-           on small screens instead of being split apart. -->
-      <div class="flex basis-full items-center gap-2 sm:basis-auto">
-        <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
-          From
-          <input
-            v-model="from"
-            type="date"
-            :max="to || undefined"
-            class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
-          />
-        </label>
-        <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
-          To
-          <input
-            v-model="to"
-            type="date"
-            :min="from || undefined"
-            class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
-          />
-        </label>
-      </div>
-    </div>
+    <FilterBar :active-count="activeFilterCount" @clear="clearFilters">
+      <template #filters>
+        <!-- From/To are one control: they wrap as a unit and share a row
+             on small screens instead of being split apart. -->
+        <div class="flex basis-full items-center gap-2 sm:basis-auto">
+          <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+            From
+            <input
+              v-model="from"
+              type="date"
+              :max="to || undefined"
+              class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+            />
+          </label>
+          <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+            To
+            <input
+              v-model="to"
+              type="date"
+              :min="from || undefined"
+              class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+            />
+          </label>
+        </div>
+      </template>
+    </FilterBar>
 
     <DataTable
       :columns="columns"

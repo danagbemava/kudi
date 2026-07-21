@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import PaymentSimulatorModal from '../components/transactions/PaymentSimulatorModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import DataTable from '../components/ui/DataTable.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
+import FilterBar from '../components/ui/FilterBar.vue'
 import PaginationBar from '../components/ui/PaginationBar.vue'
 import StatusBadge from '../components/ui/StatusBadge.vue'
 import { useTransactionsStore } from '../stores/transactions'
@@ -50,63 +51,79 @@ watch(page, load)
 
 const columns = ['Reference', 'Merchant', 'Gross', 'Fee', 'Net', 'Status', 'Date']
 const hasFilters = () => Boolean(search.value || status.value || from.value || to.value)
+
+// Search sits outside the collapsible panel, so it is not counted here.
+const activeFilterCount = computed(
+  () => [status.value, from.value, to.value].filter(Boolean).length,
+)
+
+function clearFilters(): void {
+  status.value = ''
+  from.value = ''
+  to.value = ''
+}
 </script>
 
 <template>
   <div>
-    <div class="sticky top-16 z-20 -mx-4 mb-4 flex flex-wrap items-center gap-3 border-b border-line bg-canvas px-4 py-3 sm:static sm:mx-0 sm:border-0 sm:px-0 sm:py-0">
-      <div class="relative basis-full sm:max-w-56 sm:flex-1 sm:basis-auto">
-        <svg
-          class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
-          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"
+    <FilterBar :active-count="activeFilterCount" @clear="clearFilters">
+      <template #search>
+        <div class="relative basis-full sm:max-w-56 sm:flex-1 sm:basis-auto">
+          <svg
+            class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <input
+            v-model="search"
+            type="search"
+            placeholder="Search reference…"
+            aria-label="Search by payment reference"
+            class="w-full rounded-lg border border-field bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-500 hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          />
+        </div>
+      </template>
+
+      <template #filters>
+        <select
+          v-model="status"
+          aria-label="Filter by status"
+          class="rounded-lg border border-field bg-white px-3 py-2 text-sm hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-        </svg>
-        <input
-          v-model="search"
-          type="search"
-          placeholder="Search reference…"
-          aria-label="Search by payment reference"
-          class="w-full rounded-lg border border-field bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-500 hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
-        />
-      </div>
+          <option value="">All statuses</option>
+          <option value="successful">Successful</option>
+          <option value="pending">Pending</option>
+          <option value="failed">Failed</option>
+        </select>
+        <!-- From/To are one control, so they wrap as a unit and share a full row
+             on small screens rather than being split across two. -->
+        <div class="order-last flex basis-full items-center gap-2 sm:order-none sm:basis-auto">
+          <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+            From
+            <input
+              v-model="from"
+              type="date"
+              :max="to || undefined"
+              class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600 sm:w-auto"
+            />
+          </label>
+          <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+            To
+            <input
+              v-model="to"
+              type="date"
+              :min="from || undefined"
+              class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600 sm:w-auto"
+            />
+          </label>
+        </div>
+      </template>
 
-      <select
-        v-model="status"
-        aria-label="Filter by status"
-        class="rounded-lg border border-field bg-white px-3 py-2 text-sm hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
-      >
-        <option value="">All statuses</option>
-        <option value="successful">Successful</option>
-        <option value="pending">Pending</option>
-        <option value="failed">Failed</option>
-      </select>
-
-      <!-- From/To are one control, so they wrap as a unit and share a full row
-           on small screens rather than being split across two. -->
-      <div class="order-last flex basis-full items-center gap-2 sm:order-none sm:basis-auto">
-        <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
-          From
-          <input
-            v-model="from"
-            type="date"
-            :max="to || undefined"
-            class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600 sm:w-auto"
-          />
-        </label>
-        <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
-          To
-          <input
-            v-model="to"
-            type="date"
-            :min="from || undefined"
-            class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600 sm:w-auto"
-          />
-        </label>
-      </div>
-
-      <BaseButton class="ml-auto" @click="simulatorOpen = true">Simulate payment</BaseButton>
-    </div>
+      <template #action>
+        <BaseButton @click="simulatorOpen = true">Simulate payment</BaseButton>
+      </template>
+    </FilterBar>
 
     <DataTable
       :columns="columns"
