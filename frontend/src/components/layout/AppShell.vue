@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { usePageTitle } from '../../composables/usePageTitle'
 import { useToast } from '../../composables/useToast'
 import { useAuthStore } from '../../stores/auth'
 import SideNav from './SideNav.vue'
@@ -12,11 +13,13 @@ const toast = useToast()
 
 const drawerOpen = ref(false)
 const announcement = ref('')
+const { override: pageTitle } = usePageTitle()
+const heading = computed(() => pageTitle.value ?? (route.meta.title as string | undefined) ?? '')
 
 watch(
-  () => route.meta.title,
+  heading,
   (title) => {
-    if (title) announcement.value = `${title as string} page loaded`
+    if (title) announcement.value = `${title} page loaded`
   },
   { immediate: true },
 )
@@ -135,8 +138,8 @@ async function logout(): Promise<void> {
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </button>
-          <h1 class="font-display text-lg font-semibold text-ink">
-            {{ route.meta.title }}
+          <h1 class="font-display truncate text-lg font-semibold text-ink">
+            {{ heading }}
           </h1>
         </div>
 

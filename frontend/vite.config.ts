@@ -12,8 +12,6 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': backend,
-      '/login': backend,
-      '/logout': backend,
       '/sanctum': backend,
     },
   },

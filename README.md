@@ -42,6 +42,15 @@ cd frontend && npm test           # 15 tests — money math, components, stores
 cd frontend && npm run lint       # ESLint, incl. vue/no-undef-components
 ```
 
+## Screens
+
+| | |
+|---|---|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Merchant detail](docs/screenshots/merchant-detail.png) |
+| **Dashboard** — balances, volume, settlements, fees, 30-day chart | **Merchant detail** — wallet, stats, transactions and settlements |
+| ![Payment simulator](docs/screenshots/payment-simulator.png) | ![Mobile](docs/screenshots/dashboard-mobile.png) |
+| **Payment simulator** — live gross → 1.5% fee → net breakdown | **Mobile** — stacked cards, drawer navigation |
+
 ## What's included
 
 - **Dashboard** — total merchant balances, payment volume, settlement totals, platform fees, a 30-day volume chart, and recent transactions.

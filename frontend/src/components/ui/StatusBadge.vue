@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// Badges carry a uniform min-width so a money column sitting to their left
+// stays aligned whether the label reads "pending" or "successful".
 type Status = 'pending' | 'successful' | 'failed' | 'active' | 'inactive'
 
 defineProps<{ status: Status }>()
@@ -15,7 +17,7 @@ const tones: Record<Status, { chip: string; dot: string }> = {
 <template>
   <span
     :class="[
-      'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset',
+      'inline-flex min-w-[6.25rem] items-center justify-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset',
       tones[status].chip,
     ]"
   >

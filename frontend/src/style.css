@@ -32,17 +32,20 @@
   --color-kente-red: #c8102e;
 }
 
-/* The signature kente thread: a woven stripe used on the balance hero card
-   and the global loading bar. */
+/* The signature kente thread: a single woven motif marking the top-left of a
+   balance card. Deliberately short — run edge to edge it repeats into a
+   barcode and reads as a rendering fault rather than a mark. */
 .kente-thread {
   height: 3px;
-  background: repeating-linear-gradient(
+  width: 84px;
+  background: linear-gradient(
     90deg,
-    var(--color-kente-gold) 0 28px,
-    var(--color-kente-green) 28px 44px,
-    var(--color-kente-red) 44px 56px,
-    var(--color-ink) 56px 60px
+    var(--color-kente-gold) 0 36px,
+    var(--color-kente-green) 36px 56px,
+    var(--color-kente-red) 56px 72px,
+    var(--color-kente-gold) 72px 84px
   );
+  border-bottom-right-radius: 2px;
 }
 
 /* Always reserve the scrollbar's width so pages that differ in height

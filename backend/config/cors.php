@@ -10,7 +10,7 @@ return [
     | origin must be allowed explicitly and credentials must be supported.
     */
 
-    'paths' => ['api/*', 'login', 'logout', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 

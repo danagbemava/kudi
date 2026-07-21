@@ -29,8 +29,8 @@ onMounted(() => {
 
     <template v-else>
       <!-- Balance hero + stat cards -->
-      <div class="grid gap-4 lg:grid-cols-4">
-        <div class="overflow-hidden rounded-xl bg-ink text-white lg:col-span-1">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="overflow-hidden rounded-xl bg-ink text-white sm:col-span-2 lg:col-span-1">
           <div class="kente-thread" aria-hidden="true" />
           <div class="p-5">
             <p class="text-xs font-medium tracking-wide text-slate-400 uppercase">
@@ -116,9 +116,12 @@ onMounted(() => {
             <li
               v-for="transaction in dashboard.data?.recent_transactions"
               :key="transaction.id"
-              class="flex items-center gap-4 px-4 py-3"
+              class="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-3 sm:flex-nowrap"
             >
-              <div class="min-w-0 flex-1">
+              <!-- On a phone the amount and badge take a second line, so the
+                   merchant name gets the full width instead of truncating to
+                   an unrecognisable stub. -->
+              <div class="min-w-0 basis-full sm:flex-1 sm:basis-auto">
                 <p class="truncate text-sm font-medium text-ink">
                   {{ transaction.merchant?.business_name }}
                 </p>
@@ -129,7 +132,7 @@ onMounted(() => {
               <p class="font-display text-sm font-semibold text-ink">
                 {{ formatMoney(transaction.gross_amount) }}
               </p>
-              <StatusBadge :status="transaction.status" />
+              <StatusBadge :status="transaction.status" class="ml-auto sm:ml-0" />
             </li>
           </ul>
         </div>

@@ -38,7 +38,7 @@ watch(
     <p class="sr-only" role="status" aria-live="polite">{{ status }}</p>
 
     <div class="overflow-x-auto">
-      <table class="w-full text-left text-sm" :aria-busy="loading">
+      <table class="w-full text-left text-sm whitespace-nowrap" :aria-busy="loading">
         <caption class="sr-only">
           {{ label }}
         </caption>

@@ -45,12 +45,12 @@ function query(params: object): Record<string, unknown> {
 export const api = {
   async login(email: string, password: string): Promise<User> {
     await ensureCsrf()
-    const { data } = await http.post<{ data: User }>('/login', { email, password })
+    const { data } = await http.post<{ data: User }>('/api/login', { email, password })
     return data.data
   },
 
   async logout(): Promise<void> {
-    await http.post('/logout')
+    await http.post('/api/logout')
   },
 
   async user(): Promise<User> {

@@ -6,7 +6,7 @@ describe('session auth', function () {
     it('logs in with valid credentials and establishes a session', function () {
         User::factory()->create(['email' => 'admin@kudi.test']);
 
-        $this->postJson('/login', [
+        $this->postJson('/api/login', [
             'email' => 'admin@kudi.test',
             'password' => 'password',
         ])->assertOk()
@@ -19,7 +19,7 @@ describe('session auth', function () {
     it('rejects invalid credentials with a field error', function () {
         User::factory()->create(['email' => 'admin@kudi.test']);
 
-        $this->postJson('/login', [
+        $this->postJson('/api/login', [
             'email' => 'admin@kudi.test',
             'password' => 'wrong-password',
         ])->assertUnprocessable()
@@ -32,7 +32,7 @@ describe('session auth', function () {
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $this->postJson('/logout')->assertNoContent();
+        $this->postJson('/api/logout')->assertNoContent();
 
         $this->assertGuest();
     });

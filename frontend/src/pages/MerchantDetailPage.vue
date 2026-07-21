@@ -7,6 +7,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
 import StatCard from '../components/ui/StatCard.vue'
 import StatusBadge from '../components/ui/StatusBadge.vue'
+import { useOwnedPageTitle } from '../composables/usePageTitle'
 import { useToast } from '../composables/useToast'
 import { useMerchantsStore } from '../stores/merchants'
 import { formatDate, formatDateTime } from '../utils/dates'
@@ -15,6 +16,7 @@ import { formatMoney } from '../utils/money'
 const route = useRoute()
 const merchants = useMerchantsStore()
 const toast = useToast()
+const pageTitle = useOwnedPageTitle()
 
 const merchantId = computed(() => Number(route.params.id))
 const merchant = computed(() => merchants.detail)
@@ -28,6 +30,7 @@ function load(): void {
 
 onMounted(load)
 watch(merchantId, load)
+watch(() => merchant.value?.business_name, (name) => pageTitle.set(name ?? null))
 
 const deactivating = computed(() => merchant.value?.status === 'active')
 
