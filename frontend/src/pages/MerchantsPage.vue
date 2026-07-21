@@ -51,7 +51,7 @@ const columns = ['Business', 'Contact', 'Institution', 'Wallet balance', 'Status
 
 <template>
   <div>
-    <div class="mb-4 flex flex-wrap items-center gap-3">
+    <div class="sticky top-16 z-20 -mx-4 mb-4 flex flex-wrap items-center gap-3 border-b border-line bg-canvas px-4 py-3 sm:static sm:mx-0 sm:border-0 sm:px-0 sm:py-0">
       <div class="relative basis-full sm:max-w-xs sm:flex-1 sm:basis-auto">
         <svg
           class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"

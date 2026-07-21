@@ -54,7 +54,7 @@ const hasFilters = () => Boolean(search.value || status.value || from.value || t
 
 <template>
   <div>
-    <div class="mb-4 flex flex-wrap items-center gap-3">
+    <div class="sticky top-16 z-20 -mx-4 mb-4 flex flex-wrap items-center gap-3 border-b border-line bg-canvas px-4 py-3 sm:static sm:mx-0 sm:border-0 sm:px-0 sm:py-0">
       <div class="relative basis-full sm:max-w-56 sm:flex-1 sm:basis-auto">
         <svg
           class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
@@ -82,24 +82,28 @@ const hasFilters = () => Boolean(search.value || status.value || from.value || t
         <option value="failed">Failed</option>
       </select>
 
-      <label class="flex items-center gap-1.5 text-sm text-slate-500">
-        From
-        <input
-          v-model="from"
-          type="date"
-          :max="to || undefined"
-          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
-        />
-      </label>
-      <label class="flex items-center gap-1.5 text-sm text-slate-500">
-        To
-        <input
-          v-model="to"
-          type="date"
-          :min="from || undefined"
-          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
-        />
-      </label>
+      <!-- From/To are one control, so they wrap as a unit and share a full row
+           on small screens rather than being split across two. -->
+      <div class="order-last flex basis-full items-center gap-2 sm:order-none sm:basis-auto">
+        <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+          From
+          <input
+            v-model="from"
+            type="date"
+            :max="to || undefined"
+            class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600 sm:w-auto"
+          />
+        </label>
+        <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+          To
+          <input
+            v-model="to"
+            type="date"
+            :min="from || undefined"
+            class="w-full min-w-0 rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600 sm:w-auto"
+          />
+        </label>
+      </div>
 
       <BaseButton class="ml-auto" @click="simulatorOpen = true">Simulate payment</BaseButton>
     </div>

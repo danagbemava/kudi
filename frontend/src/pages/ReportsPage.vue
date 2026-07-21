@@ -83,26 +83,30 @@ const activePreset = ref('All time')
         </button>
       </div>
 
-      <label class="flex items-center gap-1.5 text-sm text-slate-500">
-        From
-        <input
-          v-model="from"
-          type="date"
-          :max="to || undefined"
-          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
-          @change="activePreset = ''"
-        />
-      </label>
-      <label class="flex items-center gap-1.5 text-sm text-slate-500">
-        To
-        <input
-          v-model="to"
-          type="date"
-          :min="from || undefined"
-          class="rounded-lg border border-field bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
-          @change="activePreset = ''"
-        />
-      </label>
+      <!-- From/To are one control: they wrap as a unit and share a row
+           on small screens instead of being split apart. -->
+      <div class="flex basis-full items-center gap-2 sm:basis-auto">
+        <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+          From
+          <input
+            v-model="from"
+            type="date"
+            :max="to || undefined"
+            class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+            @change="activePreset = ''"
+          />
+        </label>
+        <label class="flex flex-1 flex-col gap-1 text-sm text-slate-500 sm:flex-none sm:flex-row sm:items-center sm:gap-1.5">
+          To
+          <input
+            v-model="to"
+            type="date"
+            :min="from || undefined"
+            class="rounded-lg border border-field bg-white px-2.5 py-2 w-full min-w-0 sm:w-auto text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+            @change="activePreset = ''"
+          />
+        </label>
+      </div>
     </div>
 
     <div v-if="error" class="rounded-xl border border-line bg-white px-6 py-16 text-center">
