@@ -5,16 +5,16 @@ const { toasts, dismiss, hold, resume } = useToast()
 
 const tones = {
   success: {
-    panel: 'border-green-200 bg-green-50 text-green-800',
-    close: 'text-green-800 hover:bg-green-100',
+    panel: 'border-forest/25 bg-forest-wash text-forest-deep',
+    close: 'text-forest-deep hover:bg-forest-wash',
   },
   error: {
-    panel: 'border-red-200 bg-red-50 text-red-800',
-    close: 'text-red-800 hover:bg-red-100',
+    panel: 'border-clay/25 bg-clay-wash text-clay',
+    close: 'text-clay hover:bg-clay-wash',
   },
   info: {
     panel: 'border-line bg-white text-ink',
-    close: 'text-slate-600 hover:bg-slate-100',
+    close: 'text-zinc-600 hover:bg-zinc-100',
   },
 }
 </script>

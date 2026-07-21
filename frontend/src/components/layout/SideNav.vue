@@ -69,14 +69,14 @@ const items = [
         :key="item.to"
         :to="item.to"
         :class="[
-          'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
-          isActive(item) ? ACTIVE : 'text-slate-300 hover:bg-white/5 hover:text-white',
+          'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold',
+          isActive(item) ? ACTIVE : 'text-zinc-300 hover:bg-white/5 hover:text-white',
         ]"
         :aria-current="isActive(item) ? 'page' : undefined"
         @click="emit('navigate')"
       >
         <svg
-          class="size-5 text-slate-400 transition-colors group-hover:text-slate-200"
+          class="size-5 text-zinc-400 transition-colors group-hover:text-zinc-200"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -90,9 +90,9 @@ const items = [
     </nav>
 
     <div class="border-t border-white/10 px-5 py-4">
-      <p class="text-[11px] leading-relaxed text-slate-300">
+      <p class="text-[11px] leading-relaxed text-zinc-300">
         Merchant Wallet &amp; Settlement<br />
-        <span class="text-slate-400">Demo environment</span>
+        <span class="text-zinc-400">Demo environment</span>
       </p>
     </div>
   </div>

@@ -1,69 +1,71 @@
-@import '@fontsource-variable/inter';
-@import '@fontsource-variable/space-grotesk';
-@import '@fontsource/jetbrains-mono';
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource-variable/ibm-plex-sans';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Space Grotesk Variable', 'Inter Variable', ui-sans-serif, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  /* Archivo carries a width axis, used expanded for money figures — the width
+     contrast against the body face is the identity, not a colour. */
+  --font-display: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
-  --color-canvas: #f8fafc;
-  --color-ink: #0f172a;
-  --color-ink-soft: #1e293b;
+  /* Warm near-black rather than the blue-black every dashboard uses. */
+  --color-ink: #17181c;
+  --color-ink-soft: #2e3138;
+  /* Paper carries a faint green cast — Ghana's flag green pulled almost to
+     neutral. Not the cream that AI design defaults to. */
+  --color-paper: #f2f4f3;
+  --color-line: #e1e4e1;
+  /* Form-control boundaries: 3.1:1 on white, meeting SC 1.4.11. */
+  --color-field: #8d9490;
 
-  /* Decorative dividers and card edges. */
-  --color-line: #e2e8f0;
-  /* Form-control boundaries. WCAG 1.4.11 wants 3:1 for the edge that identifies
-     a control; --color-line is only 1.23:1 against a white field, which makes an
-     input indistinguishable from the page. This measures 3.4:1. */
-  --color-field: #808c9f;
+  /* Kente maize. The money colour, and the accent that replaces the default
+     indigo. 8.4:1 against ink, so it carries dark text — never the reverse:
+     gold on white is 2.2:1 and must never be used for text. */
+  --color-gold: #e8a317;
+  --color-gold-deep: #c7860b;
+  --color-gold-wash: #fdf3dd;
 
-  --color-primary-50: #eef2ff;
-  --color-primary-100: #e0e7ff;
-  --color-primary-500: #6366f1;
-  --color-primary-600: #4f46e5;
-  --color-primary-700: #4338ca;
+  /* Forest is the interactive colour: 8.9:1 on white, so links and focus
+     rings are safe where gold would fail. */
+  --color-forest: #14543a;
+  --color-forest-deep: #0e3d2a;
+  --color-forest-wash: #e6efe9;
 
-  --color-accent: #ef4444;
-
-  --color-kente-gold: #f2b705;
-  --color-kente-green: #157a4a;
-  --color-kente-red: #c8102e;
-}
-
-/* The signature kente thread: a single woven motif marking the top-left of a
-   balance card. Deliberately short — run edge to edge it repeats into a
-   barcode and reads as a rendering fault rather than a mark. */
-.kente-thread {
-  height: 3px;
-  width: 84px;
-  background: linear-gradient(
-    90deg,
-    var(--color-kente-gold) 0 36px,
-    var(--color-kente-green) 36px 56px,
-    var(--color-kente-red) 56px 72px,
-    var(--color-kente-gold) 72px 84px
-  );
-  border-bottom-right-radius: 2px;
-}
-
-/* Always reserve the scrollbar's width so pages that differ in height
-   don't reflow horizontally when the scrollbar appears or disappears. */
-html {
-  scrollbar-gutter: stable;
+  --color-clay: #b33a2b;
+  --color-clay-wash: #fbeae7;
 }
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-canvas);
+  background: var(--color-paper);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Money figures and headings share the display face with tabular digits. */
+html {
+  /* Reserve the scrollbar so pages of differing height don't reflow. */
+  scrollbar-gutter: stable;
+}
+
+/* Money and headings: expanded, tight, tabular so columns of figures align. */
 .font-display {
+  font-family: var(--font-display);
+  font-stretch: 118%;
   font-feature-settings: 'tnum';
+  letter-spacing: -0.02em;
+}
+
+/* Small uppercase labels run the other way — narrow tracking's opposite —
+   so the width contrast reads as deliberate. */
+.label-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {

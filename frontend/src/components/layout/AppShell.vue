@@ -69,7 +69,7 @@ async function logout(): Promise<void> {
   <div class="min-h-screen lg:flex">
     <a
       href="#main-content"
-      class="sr-only rounded-lg bg-white px-4 py-2 text-sm font-medium text-ink shadow-lg outline-2 outline-primary-600 focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[70]"
+      class="sr-only rounded-lg bg-white px-4 py-2 text-sm font-medium text-ink shadow-lg outline-2 outline-forest focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[70]"
     >
       Skip to main content
     </a>
@@ -105,7 +105,7 @@ async function logout(): Promise<void> {
             <SideNav nav-id="main-nav" @navigate="drawerOpen = false" />
             <button
               type="button"
-              class="absolute top-4 right-3 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-primary-500"
+              class="absolute top-4 right-3 rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-gold"
               aria-label="Close navigation menu"
               @click="drawerOpen = false"
             >
@@ -128,7 +128,7 @@ async function logout(): Promise<void> {
           <button
             ref="menuButton"
             type="button"
-            class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-primary-600 lg:hidden"
+            class="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-forest lg:hidden"
             aria-label="Open navigation menu"
             aria-controls="main-nav"
             :aria-expanded="drawerOpen"
@@ -144,16 +144,16 @@ async function logout(): Promise<void> {
         </div>
 
         <div class="flex items-center gap-3">
-          <span class="hidden text-sm text-slate-500 sm:block">{{ auth.user?.email }}</span>
+          <span class="hidden text-sm text-zinc-500 sm:block">{{ auth.user?.email }}</span>
           <div
-            class="flex size-8 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700"
+            class="flex size-8 items-center justify-center rounded-full bg-forest-wash text-sm font-semibold text-forest-deep"
             aria-hidden="true"
           >
             {{ auth.user?.name?.charAt(0) ?? '?' }}
           </div>
           <button
             type="button"
-            class="rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-primary-600"
+            class="rounded-lg px-2.5 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-forest"
             @click="logout"
           >
             Sign out

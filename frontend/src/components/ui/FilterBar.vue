@@ -24,7 +24,7 @@ const panelId = useId()
 
 <template>
   <div
-    class="sticky top-16 z-20 -mx-4 mb-4 border-b border-line bg-canvas px-4 py-3 sm:static sm:mx-0 sm:border-0 sm:px-0 sm:py-0"
+    class="sticky top-16 z-20 -mx-4 mb-4 border-b border-line bg-paper px-4 py-3 sm:static sm:mx-0 sm:border-0 sm:px-0 sm:py-0"
   >
     <div class="flex flex-wrap items-center gap-3">
       <div v-if="$slots.search" class="basis-full sm:max-w-56 sm:flex-1 sm:basis-auto">
@@ -34,7 +34,7 @@ const panelId = useId()
       <button
         v-if="$slots.filters"
         type="button"
-        class="inline-flex items-center gap-1.5 rounded-lg border border-field bg-white px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 sm:hidden"
+        class="inline-flex items-center gap-1.5 rounded-lg border border-field bg-white px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest sm:hidden"
         :aria-expanded="expanded"
         :aria-controls="panelId"
         @click="expanded = !expanded"
@@ -42,12 +42,12 @@ const panelId = useId()
         Filters
         <span
           v-if="activeCount > 0"
-          class="rounded-full bg-primary-600 px-1.5 text-xs font-semibold text-white"
+          class="rounded-full bg-gold px-1.5 text-xs font-semibold text-white"
         >
           {{ activeCount }}
         </span>
         <svg
-          class="size-4 text-slate-500 transition-transform"
+          class="size-4 text-zinc-500 transition-transform"
           :class="expanded && 'rotate-180'"
           viewBox="0 0 20 20"
           fill="currentColor"
@@ -61,7 +61,9 @@ const panelId = useId()
         </svg>
       </button>
 
-      <div v-if="$slots.action" class="ml-auto">
+      <!-- Sits beside the toggle on mobile, but trails the filters on desktop:
+           the primary action belongs at the end of the row, not mid-bar. -->
+      <div v-if="$slots.action" class="ml-auto sm:order-last">
         <slot name="action" />
       </div>
 

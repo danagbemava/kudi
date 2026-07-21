@@ -6,11 +6,11 @@ type Status = 'pending' | 'successful' | 'failed' | 'active' | 'inactive'
 defineProps<{ status: Status }>()
 
 const tones: Record<Status, { chip: string; dot: string }> = {
-  successful: { chip: 'bg-green-50 text-green-700 ring-green-600/20', dot: 'bg-green-500' },
-  active: { chip: 'bg-green-50 text-green-700 ring-green-600/20', dot: 'bg-green-500' },
-  pending: { chip: 'bg-amber-50 text-amber-700 ring-amber-600/20', dot: 'bg-amber-500' },
-  failed: { chip: 'bg-red-50 text-red-700 ring-red-600/20', dot: 'bg-red-500' },
-  inactive: { chip: 'bg-slate-100 text-slate-600 ring-slate-500/20', dot: 'bg-slate-400' },
+  successful: { chip: 'bg-forest-wash text-forest ring-forest/25', dot: 'bg-forest' },
+  active: { chip: 'bg-forest-wash text-forest ring-forest/25', dot: 'bg-forest' },
+  pending: { chip: 'bg-gold-wash text-ink-soft ring-gold/40', dot: 'bg-gold' },
+  failed: { chip: 'bg-clay-wash text-clay ring-clay/25', dot: 'bg-clay' },
+  inactive: { chip: 'bg-zinc-100 text-zinc-600 ring-zinc-500/20', dot: 'bg-zinc-400' },
 }
 </script>
 

@@ -11,13 +11,13 @@ withDefaults(
 
 const styles: Record<string, string> = {
   primary:
-    'bg-primary-600 text-white hover:bg-primary-700 focus-visible:outline-primary-600 disabled:bg-primary-600/40 disabled:text-white/60',
+    'bg-gold text-ink hover:bg-gold-deep focus-visible:outline-forest disabled:bg-gold/40 disabled:text-ink/45',
   secondary:
-    'bg-white text-ink border border-line hover:bg-slate-50 focus-visible:outline-primary-600 disabled:text-slate-400',
+    'bg-white text-ink border border-line hover:bg-zinc-50 focus-visible:outline-forest disabled:text-zinc-400',
   danger:
-    'bg-white text-red-600 border border-red-200 hover:bg-red-50 focus-visible:outline-red-600 disabled:text-red-300',
+    'bg-white text-clay border border-clay/25 hover:bg-clay-wash focus-visible:outline-clay disabled:text-clay/40',
   ghost:
-    'text-slate-600 hover:bg-slate-100 hover:text-ink focus-visible:outline-primary-600 disabled:text-slate-300',
+    'text-zinc-600 hover:bg-zinc-100 hover:text-ink focus-visible:outline-forest disabled:text-zinc-300',
 }
 </script>
 

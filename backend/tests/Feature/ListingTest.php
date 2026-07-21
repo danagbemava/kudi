@@ -86,7 +86,11 @@ describe('GET /api/dashboard', function () {
                 'totals' => ['wallet_balance', 'payment_volume', 'platform_fees', 'settled', 'merchant_count', 'pending_count'],
                 'volume_series',
                 'recent_transactions',
-            ]]);
+                'unsettled' => [['id', 'business_name', 'wallet_balance']],
+            ]])
+            // Only merchants actually holding float appear, largest first.
+            ->assertJsonCount(1, 'data.unsettled')
+            ->assertJsonPath('data.unsettled.0.wallet_balance', 9_850);
     });
 });
 

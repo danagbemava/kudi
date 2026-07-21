@@ -48,8 +48,17 @@ cd frontend && npm run lint       # ESLint, incl. vue/no-undef-components
 |---|---|
 | ![Dashboard](docs/screenshots/dashboard.png) | ![Merchant detail](docs/screenshots/merchant-detail.png) |
 | **Dashboard** — balances, volume, settlements, fees, 30-day chart | **Merchant detail** — wallet, stats, transactions and settlements |
-| ![Payment simulator](docs/screenshots/payment-simulator.png) | ![Mobile](docs/screenshots/dashboard-mobile.png) |
-| **Payment simulator** — live gross → 1.5% fee → net breakdown | **Mobile** — stacked cards, drawer navigation |
+| ![Payment simulator](docs/screenshots/payment-simulator.png) | ![Mobile](docs/screenshots/transactions-mobile.png) |
+| **Payment simulator** — live gross → 1.5% fee → net breakdown | **Mobile** — ledgers become cards, filters collapse behind a toggle |
+
+## Design
+
+The interface is built around the settlement cycle rather than around a grid of statistics: float accumulates in merchant wallets, a run sweeps it out, and the balance resets. That rhythm is the operator's whole job, so it leads.
+
+- **The settlement band** is the one bold element. The float waiting to be settled is drawn as proportional strips, one per merchant, so you can see *whose* money is sitting there — composition a total can never show. Kente is woven as narrow strips of banded cloth sewn edge to edge, so the reference is structural and driven by the data, not a pattern applied on top. Everything around it is kept quiet.
+- **Colour.** Kente maize (`#E8A317`) is the accent, because gold is the obvious colour for money in a Ghanaian payments product and because the alternative — Tailwind's default indigo — is what every dashboard reaches for. Deep forest green carries interactive text and settled states, clay carries failure, on a warm near-black and a paper with a faint green cast. Gold measures 2.2:1 on white, so it only ever appears as a fill behind dark text, never as text itself.
+- **Type.** Archivo, used at an expanded width for money figures, against IBM Plex Sans for the interface and IBM Plex Mono for machine identifiers. The width contrast between the display and body faces is the identity, rather than a colour or an ornament.
+- **Currency** displays as the ISO code (`GHS 1,250.75`) rather than the ₵ symbol: Archivo draws U+20B5 as a C with a stubby tick that reads as "GHC" at display sizes, and money is the entire content of this product.
 
 ## What's included
 

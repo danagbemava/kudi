@@ -68,6 +68,8 @@ export interface DashboardData {
   }
   volume_series: { date: string; volume: number; fees: number }[]
   recent_transactions: Transaction[]
+  /** Merchants holding float, largest first — drives the settlement band. */
+  unsettled: { id: number; business_name: string; wallet_balance: number }[]
 }
 
 export interface ReportSummary {

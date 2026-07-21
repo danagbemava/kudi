@@ -42,11 +42,11 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-  <main class="flex min-h-screen items-center justify-center bg-canvas px-4">
+  <main class="flex min-h-screen items-center justify-center bg-paper px-4">
     <div class="w-full max-w-sm">
       <div class="mb-8 text-center">
         <h1><KudiLogo class="text-2xl" /></h1>
-        <p class="mt-2 text-sm text-slate-500">Merchant Wallet &amp; Settlement Dashboard</p>
+        <p class="mt-2 text-sm text-zinc-500">Merchant Wallet &amp; Settlement Dashboard</p>
       </div>
 
       <div class="overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
@@ -68,11 +68,11 @@ async function submit(): Promise<void> {
             :error="fieldErrors.password"
           />
 
-          <p v-if="formError" class="text-sm text-red-600" role="alert">{{ formError }}</p>
+          <p v-if="formError" class="text-sm text-clay" role="alert">{{ formError }}</p>
 
           <BaseButton type="submit" class="w-full" :loading="submitting">Sign in</BaseButton>
 
-          <p class="text-center text-xs text-slate-500">
+          <p class="text-center text-xs text-zinc-500">
             Demo credentials are prefilled — just sign in.
           </p>
         </form>

@@ -32,7 +32,31 @@ class DashboardController extends Controller
             'recent_transactions' => TransactionResource::collection(
                 Transaction::with('merchant')->latest()->limit(8)->get()
             )->resolve(),
+            'unsettled' => $this->unsettledFloat(),
         ]]);
+    }
+
+    /**
+     * Who is actually holding the money waiting to be settled, largest first.
+     * The dashboard renders this as proportional bands, so the composition of
+     * the float is visible rather than just its total.
+     *
+     * @return array<int, array{id: int, business_name: string, wallet_balance: int}>
+     */
+    private function unsettledFloat(): array
+    {
+        return Merchant::query()
+            ->join('wallets', 'wallets.merchant_id', '=', 'merchants.id')
+            ->where('wallets.balance', '>', 0)
+            ->orderByDesc('wallets.balance')
+            ->limit(40)
+            ->get(['merchants.id', 'merchants.business_name', 'wallets.balance'])
+            ->map(fn ($row) => [
+                'id' => (int) $row->id,
+                'business_name' => $row->business_name,
+                'wallet_balance' => (int) $row->balance,
+            ])
+            ->all();
     }
 
     /**

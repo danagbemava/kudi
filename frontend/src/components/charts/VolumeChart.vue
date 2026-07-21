@@ -46,19 +46,19 @@ const data = computed(() => ({
   datasets: [
     {
       data: props.series.map((point) => point.volume),
-      borderColor: '#4f46e5',
+      borderColor: '#14543A',
       borderWidth: 2,
       pointRadius: 0,
       pointHoverRadius: 4,
-      pointHoverBackgroundColor: '#4f46e5',
+      pointHoverBackgroundColor: '#14543A',
       tension: 0.35,
       fill: true,
       backgroundColor: (context: { chart: Chart }) => {
         const { ctx, chartArea } = context.chart
-        if (!chartArea) return 'rgba(79, 70, 229, 0.08)'
+        if (!chartArea) return 'rgba(20, 84, 58, 0.08)'
         const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
-        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.18)')
-        gradient.addColorStop(1, 'rgba(79, 70, 229, 0)')
+        gradient.addColorStop(0, 'rgba(20, 84, 58, 0.16)')
+        gradient.addColorStop(1, 'rgba(20, 84, 58, 0)')
         return gradient
       },
     },
@@ -71,7 +71,7 @@ const options = {
   interaction: { mode: 'index' as const, intersect: false },
   plugins: {
     tooltip: {
-      backgroundColor: '#0f172a',
+      backgroundColor: '#17181C',
       padding: 10,
       displayColors: false,
       callbacks: {
@@ -86,7 +86,7 @@ const options = {
     },
     y: {
       border: { display: false },
-      grid: { color: '#f1f5f9' },
+      grid: { color: '#E8ECE9' },
       ticks: {
         maxTicksLimit: 5,
         color: '#475569',

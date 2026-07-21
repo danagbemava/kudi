@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import VolumeChart from '../components/charts/VolumeChart.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
+import SettlementBand from '../components/dashboard/SettlementBand.vue'
 import StatCard from '../components/ui/StatCard.vue'
 import StatusBadge from '../components/ui/StatusBadge.vue'
 import { useDashboardStore } from '../stores/dashboard'
@@ -23,29 +24,40 @@ onMounted(() => {
       v-if="dashboard.error"
       class="rounded-xl border border-line bg-white px-6 py-16 text-center"
     >
-      <p class="text-sm text-slate-600" role="alert">{{ dashboard.error }}</p>
+      <p class="text-sm text-zinc-600" role="alert">{{ dashboard.error }}</p>
       <BaseButton variant="secondary" class="mt-4" @click="dashboard.fetch()">Retry</BaseButton>
     </div>
 
     <template v-else>
-      <!-- Balance hero + stat cards -->
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="overflow-hidden rounded-xl bg-ink text-white sm:col-span-2 lg:col-span-1">
-          <div class="kente-thread" aria-hidden="true" />
-          <div class="p-5">
-            <p class="text-xs font-medium tracking-wide text-slate-400 uppercase">
-              Merchant balances
-            </p>
-            <div v-if="dashboard.loading" class="mt-2 h-8 w-36 animate-pulse rounded bg-white/20" />
-            <p v-else class="font-display mt-1.5 text-2xl font-semibold">
+      <!-- The float waiting to be settled, and whose it is. This is the number
+           the operator acts on, so it leads and the rest supports it. -->
+      <section class="overflow-hidden rounded-xl bg-ink p-5 text-white sm:p-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="label-eyebrow text-gold">Waiting to settle</p>
+            <div v-if="dashboard.loading" class="mt-2 h-10 w-56 animate-pulse rounded bg-white/15" />
+            <p v-else class="font-display mt-1 text-4xl font-semibold sm:text-5xl">
               {{ formatMoney(dashboard.data?.totals.wallet_balance ?? 0) }}
             </p>
-            <p class="mt-1 text-sm text-slate-400">
-              across {{ dashboard.data?.totals.merchant_count ?? '—' }} merchants
+            <p class="mt-1.5 text-sm text-zinc-300">
+              held across {{ dashboard.data?.unsettled.length ?? '—' }} of
+              {{ dashboard.data?.totals.merchant_count ?? '—' }} merchants
             </p>
           </div>
+
+          <RouterLink to="/settlements" class="shrink-0">
+            <BaseButton>Run settlement</BaseButton>
+          </RouterLink>
         </div>
 
+        <SettlementBand
+          v-if="!dashboard.loading && dashboard.data"
+          :merchants="dashboard.data.unsettled"
+          :total="dashboard.data.totals.wallet_balance"
+        />
+      </section>
+
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label="Payment volume"
           :value="formatMoney(dashboard.data?.totals.payment_volume ?? 0)"
@@ -71,7 +83,7 @@ onMounted(() => {
         <div class="mb-4 flex items-center justify-between">
           <h2 class="font-display text-sm font-semibold text-ink">Payment volume — last 30 days</h2>
         </div>
-        <div v-if="dashboard.loading" class="h-64 animate-pulse rounded-lg bg-slate-100" />
+        <div v-if="dashboard.loading" class="h-64 animate-pulse rounded-lg bg-zinc-100" />
         <VolumeChart v-else-if="dashboard.data" :series="dashboard.data.volume_series" />
       </section>
 
@@ -81,7 +93,7 @@ onMounted(() => {
           <h2 class="font-display text-sm font-semibold text-ink">Recent transactions</h2>
           <RouterLink
             to="/transactions"
-            class="text-sm font-medium text-primary-600 hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-primary-600"
+            class="text-sm font-medium text-forest hover:text-forest-deep focus-visible:outline-2 focus-visible:outline-forest"
           >
             View all
           </RouterLink>
@@ -90,8 +102,8 @@ onMounted(() => {
         <div class="overflow-hidden rounded-xl border border-line bg-white">
           <div v-if="dashboard.loading" class="divide-y divide-line/60">
             <div v-for="row in 5" :key="row" class="flex items-center justify-between px-4 py-3.5">
-              <div class="h-4 w-40 animate-pulse rounded bg-slate-200" />
-              <div class="h-4 w-24 animate-pulse rounded bg-slate-200" />
+              <div class="h-4 w-40 animate-pulse rounded bg-zinc-200" />
+              <div class="h-4 w-24 animate-pulse rounded bg-zinc-200" />
             </div>
           </div>
 
@@ -125,7 +137,7 @@ onMounted(() => {
                 <p class="truncate text-sm font-medium text-ink">
                   {{ transaction.merchant?.business_name }}
                 </p>
-                <p class="font-mono truncate text-xs text-slate-500">
+                <p class="font-mono truncate text-xs text-zinc-500">
                   {{ transaction.reference }} · {{ formatDateTime(transaction.created_at) }}
                 </p>
               </div>

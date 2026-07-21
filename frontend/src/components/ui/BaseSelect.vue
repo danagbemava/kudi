@@ -15,7 +15,7 @@ const id = useId()
   <div>
     <label :for="id" class="mb-1.5 block text-sm font-medium text-ink">
       {{ label }}
-      <span v-if="required" class="text-red-600" aria-hidden="true">*</span>
+      <span v-if="required" class="text-clay" aria-hidden="true">*</span>
     </label>
     <div class="relative">
       <select
@@ -28,15 +28,15 @@ const id = useId()
           'w-full appearance-none rounded-lg border bg-white py-2 pr-9 pl-3 text-sm text-ink transition-colors',
           'focus:outline-2 focus:outline-offset-1',
           error
-            ? 'border-red-400 focus:outline-red-500'
-            : 'border-field focus:outline-primary-600 hover:border-slate-500',
+            ? 'border-clay focus:outline-clay'
+            : 'border-field focus:outline-forest hover:border-zinc-500',
         ]"
       >
         <slot />
       </select>
       <!-- appearance-none removes the native arrow, so draw the affordance back. -->
       <svg
-        class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-slate-500"
+        class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-zinc-500"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"
@@ -48,7 +48,7 @@ const id = useId()
         />
       </svg>
     </div>
-    <p v-if="error" :id="`${id}-error`" class="mt-1.5 text-sm text-red-600" role="alert">
+    <p v-if="error" :id="`${id}-error`" class="mt-1.5 text-sm text-clay" role="alert">
       {{ error }}
     </p>
   </div>

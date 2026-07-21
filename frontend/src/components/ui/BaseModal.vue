@@ -114,7 +114,7 @@ function onKeydown(event: KeyboardEvent): void {
             <button
               type="button"
               data-modal-close
-              class="rounded-md p-1 text-slate-500 transition-colors hover:bg-slate-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-primary-600"
+              class="rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-forest"
               aria-label="Close dialog"
               @click="emit('close')"
             >

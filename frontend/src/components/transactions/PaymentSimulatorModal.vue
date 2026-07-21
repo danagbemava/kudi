@@ -148,22 +148,22 @@ async function submit(): Promise<void> {
       <p class="font-display mt-3 text-2xl font-semibold text-ink">
         {{ formatMoney(result.gross_amount) }}
       </p>
-      <p class="font-mono mt-1 text-xs text-slate-500">{{ result.reference }}</p>
+      <p class="font-mono mt-1 text-xs text-zinc-500">{{ result.reference }}</p>
 
-      <dl class="mt-4 space-y-1.5 rounded-lg bg-slate-50 p-4 text-sm">
+      <dl class="mt-4 space-y-1.5 rounded-lg bg-zinc-50 p-4 text-sm">
         <div class="flex justify-between">
-          <dt class="text-slate-500">Gross amount</dt>
+          <dt class="text-zinc-500">Gross amount</dt>
           <dd class="font-medium text-ink">{{ formatMoney(result.gross_amount) }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-slate-500">Processing fee (1.5%)</dt>
+          <dt class="text-zinc-500">Processing fee (1.5%)</dt>
           <dd class="font-medium text-ink">− {{ formatMoney(result.fee_amount) }}</dd>
         </div>
         <div class="flex justify-between border-t border-line pt-1.5">
           <dt class="font-medium text-ink">
             {{ result.status === 'successful' ? 'Credited to wallet' : 'Would have credited' }}
           </dt>
-          <dd class="font-display font-semibold" :class="result.status === 'successful' ? 'text-green-700' : 'text-slate-500 line-through'">
+          <dd class="font-display font-semibold" :class="result.status === 'successful' ? 'text-forest' : 'text-zinc-500 line-through'">
             {{ formatMoney(result.net_amount) }}
           </dd>
         </div>
@@ -196,7 +196,7 @@ async function submit(): Promise<void> {
       <BaseInput
         v-model="amountInput"
         label="Amount"
-        prefix="GH₵"
+        prefix="GHS"
         placeholder="150.00"
         required
         :error="amountError"
@@ -213,28 +213,28 @@ async function submit(): Promise<void> {
       <p class="sr-only" role="status">{{ feeAnnouncement }}</p>
 
       <!-- Live fee preview -->
-      <dl class="space-y-1.5 rounded-lg bg-slate-50 p-4 text-sm">
+      <dl class="space-y-1.5 rounded-lg bg-zinc-50 p-4 text-sm">
         <div class="flex justify-between">
-          <dt class="text-slate-500">Gross amount</dt>
+          <dt class="text-zinc-500">Gross amount</dt>
           <dd class="font-medium text-ink">
             {{ amountMinor !== null ? formatMoney(amountMinor) : '—' }}
           </dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-slate-500">Processing fee (1.5%)</dt>
+          <dt class="text-zinc-500">Processing fee (1.5%)</dt>
           <dd class="font-medium text-ink">{{ fee !== null ? `− ${formatMoney(fee)}` : '—' }}</dd>
         </div>
         <div class="flex justify-between border-t border-line pt-1.5">
           <dt class="font-medium text-ink">Net wallet credit</dt>
-          <dd class="font-display font-semibold text-primary-600">
+          <dd class="font-display font-semibold text-forest">
             {{ net !== null ? formatMoney(net) : '—' }}
           </dd>
         </div>
       </dl>
 
       <div class="flex items-center justify-end gap-2 pt-1">
-        <p v-if="phase === 'submitting'" class="mr-auto flex items-center gap-2 text-sm text-slate-500">
-          <span class="size-1.5 animate-pulse rounded-full bg-amber-500" aria-hidden="true" />
+        <p v-if="phase === 'submitting'" class="mr-auto flex items-center gap-2 text-sm text-zinc-500">
+          <span class="size-1.5 animate-pulse rounded-full bg-gold" aria-hidden="true" />
           Waiting for gateway…
         </p>
         <BaseButton variant="secondary" :disabled="phase === 'submitting'" @click="emit('close')">

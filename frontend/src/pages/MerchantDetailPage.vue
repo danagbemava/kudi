@@ -57,10 +57,10 @@ async function toggleStatus(): Promise<void> {
 
 <template>
   <div>
-    <nav class="mb-4 text-sm text-slate-500" aria-label="Breadcrumb">
+    <nav class="mb-4 text-sm text-zinc-500" aria-label="Breadcrumb">
       <RouterLink
         to="/merchants"
-        class="hover:text-ink focus-visible:outline-2 focus-visible:outline-primary-600"
+        class="hover:text-ink focus-visible:outline-2 focus-visible:outline-forest"
       >
         Merchants
       </RouterLink>
@@ -70,11 +70,11 @@ async function toggleStatus(): Promise<void> {
 
     <!-- Loading skeleton -->
     <div v-if="merchants.detailLoading" class="space-y-4">
-      <div class="h-20 animate-pulse rounded-xl bg-slate-200" />
+      <div class="h-20 animate-pulse rounded-xl bg-zinc-200" />
       <div class="grid gap-4 lg:grid-cols-4">
-        <div v-for="i in 4" :key="i" class="h-28 animate-pulse rounded-xl bg-slate-100" />
+        <div v-for="i in 4" :key="i" class="h-28 animate-pulse rounded-xl bg-zinc-100" />
       </div>
-      <div class="h-64 animate-pulse rounded-xl bg-slate-100" />
+      <div class="h-64 animate-pulse rounded-xl bg-zinc-100" />
     </div>
 
     <!-- Error -->
@@ -82,7 +82,7 @@ async function toggleStatus(): Promise<void> {
       v-else-if="merchants.detailError"
       class="rounded-xl border border-line bg-white px-6 py-16 text-center"
     >
-      <p class="text-sm text-slate-600" role="alert">{{ merchants.detailError }}</p>
+      <p class="text-sm text-zinc-600" role="alert">{{ merchants.detailError }}</p>
       <BaseButton variant="secondary" class="mt-4" @click="load">Retry</BaseButton>
     </div>
 
@@ -96,10 +96,10 @@ async function toggleStatus(): Promise<void> {
             </h2>
             <StatusBadge :status="merchant.status" />
           </div>
-          <p class="mt-1 text-sm text-slate-500">
+          <p class="mt-1 text-sm text-zinc-500">
             {{ merchant.name }} · {{ merchant.email }}
           </p>
-          <p class="mt-0.5 text-sm text-slate-500">
+          <p class="mt-0.5 text-sm text-zinc-500">
             {{ merchant.institution?.name }} ·
             <span class="font-mono">{{ merchant.account_number }}</span>
             · registered {{ formatDate(merchant.created_at) }}
@@ -118,11 +118,11 @@ async function toggleStatus(): Promise<void> {
         <div class="overflow-hidden rounded-xl bg-ink text-white">
           <div class="kente-thread" aria-hidden="true" />
           <div class="p-5">
-            <p class="text-xs font-medium tracking-wide text-slate-400 uppercase">Wallet balance</p>
+            <p class="text-xs font-medium tracking-wide text-zinc-400 uppercase">Wallet balance</p>
             <p class="font-display mt-1.5 text-2xl font-semibold">
               {{ formatMoney(merchant.wallet_balance ?? 0) }}
             </p>
-            <p class="mt-1 text-sm text-slate-400">cleared at next settlement</p>
+            <p class="mt-1 text-sm text-zinc-400">cleared at next settlement</p>
           </div>
         </div>
         <StatCard
@@ -161,14 +161,14 @@ async function toggleStatus(): Promise<void> {
                 class="flex items-center gap-3 px-4 py-3"
               >
                 <div class="min-w-0 flex-1">
-                  <p class="font-mono truncate text-xs text-slate-500">{{ transaction.reference }}</p>
-                  <p class="text-xs text-slate-500">{{ formatDateTime(transaction.created_at) }}</p>
+                  <p class="font-mono truncate text-xs text-zinc-500">{{ transaction.reference }}</p>
+                  <p class="text-xs text-zinc-500">{{ formatDateTime(transaction.created_at) }}</p>
                 </div>
                 <div class="text-right">
                   <p class="font-display text-sm font-semibold text-ink">
                     {{ formatMoney(transaction.gross_amount) }}
                   </p>
-                  <p class="text-xs text-slate-500">net {{ formatMoney(transaction.net_amount) }}</p>
+                  <p class="text-xs text-zinc-500">net {{ formatMoney(transaction.net_amount) }}</p>
                 </div>
                 <StatusBadge :status="transaction.status" />
               </li>
@@ -193,8 +193,8 @@ async function toggleStatus(): Promise<void> {
                 class="flex items-center gap-3 px-4 py-3"
               >
                 <div class="min-w-0 flex-1">
-                  <p class="font-mono truncate text-xs text-slate-500">{{ settlement.reference }}</p>
-                  <p class="text-xs text-slate-500">{{ formatDate(settlement.settled_at) }}</p>
+                  <p class="font-mono truncate text-xs text-zinc-500">{{ settlement.reference }}</p>
+                  <p class="text-xs text-zinc-500">{{ formatDate(settlement.settled_at) }}</p>
                 </div>
                 <p class="font-display text-sm font-semibold text-ink">
                   {{ formatMoney(settlement.amount) }}

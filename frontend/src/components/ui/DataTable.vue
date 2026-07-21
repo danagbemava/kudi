@@ -48,12 +48,12 @@ watch(
           {{ label }}
         </caption>
         <thead>
-          <tr class="border-b border-line bg-slate-50/80">
+          <tr class="border-b border-line bg-zinc-50/80">
             <th
               v-for="column in columns"
               :key="column"
               scope="col"
-              class="px-4 py-3 text-xs font-semibold tracking-wide text-slate-500 uppercase"
+              class="px-4 py-3 text-xs font-semibold tracking-wide text-zinc-500 uppercase"
             >
               {{ column }}
             </th>
@@ -66,7 +66,7 @@ watch(
           <tr v-for="row in 6" :key="row" class="border-b border-line/60 last:border-0">
             <td v-for="(_, index) in columns" :key="index" class="px-4 py-3.5">
               <div
-                class="h-4 animate-pulse rounded bg-slate-200"
+                class="h-4 animate-pulse rounded bg-zinc-200"
                 :style="{ width: `${55 + ((row * 7 + index * 13) % 40)}%` }"
               />
             </td>
@@ -82,8 +82,8 @@ watch(
     <div class="md:hidden" :aria-busy="loading">
       <ul v-if="loading" class="divide-y divide-line/60" aria-hidden="true">
         <li v-for="row in 5" :key="row" class="space-y-2 px-4 py-3.5">
-          <div class="h-4 w-2/5 animate-pulse rounded bg-slate-200" />
-          <div class="h-3 w-3/5 animate-pulse rounded bg-slate-100" />
+          <div class="h-4 w-2/5 animate-pulse rounded bg-zinc-200" />
+          <div class="h-3 w-3/5 animate-pulse rounded bg-zinc-100" />
         </li>
       </ul>
 
@@ -93,7 +93,7 @@ watch(
     </div>
 
     <div v-if="!loading && error" class="px-4 py-12 text-center">
-      <p class="text-sm text-slate-600" role="alert">{{ error }}</p>
+      <p class="text-sm text-zinc-600" role="alert">{{ error }}</p>
       <BaseButton variant="secondary" class="mt-4" @click="emit('retry')">Retry</BaseButton>
     </div>
 

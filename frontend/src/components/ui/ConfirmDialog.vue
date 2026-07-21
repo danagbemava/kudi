@@ -18,7 +18,7 @@ const emit = defineEmits<{ close: []; confirm: [] }>()
 
 <template>
   <BaseModal :open="open" :title="title" @close="emit('close')">
-    <div class="text-sm text-slate-600">
+    <div class="text-sm text-zinc-600">
       <slot />
     </div>
     <div class="mt-5 flex justify-end gap-2">

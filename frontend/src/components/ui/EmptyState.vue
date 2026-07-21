@@ -14,7 +14,7 @@ withDefaults(
 <template>
   <div class="mx-auto max-w-sm text-center">
     <div
-      class="mx-auto flex size-11 items-center justify-center rounded-full bg-primary-50 text-primary-600"
+      class="mx-auto flex size-11 items-center justify-center rounded-full bg-forest-wash text-forest"
       aria-hidden="true"
     >
       <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -28,7 +28,7 @@ withDefaults(
     <component :is="`h${level}`" class="font-display mt-3 text-sm font-semibold text-ink">
       {{ title }}
     </component>
-    <p class="mt-1 text-sm text-slate-500">{{ message }}</p>
+    <p class="mt-1 text-sm text-zinc-500">{{ message }}</p>
     <div v-if="$slots.action" class="mt-4">
       <slot name="action" />
     </div>
