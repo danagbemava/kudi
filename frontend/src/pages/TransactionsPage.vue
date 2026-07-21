@@ -67,7 +67,7 @@ const hasFilters = () => Boolean(search.value || status.value || from.value || t
           type="search"
           placeholder="Search reference…"
           aria-label="Search by payment reference"
-          class="w-full rounded-lg border border-line bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-400 hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
+          class="w-full rounded-lg border border-line bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-500 hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
         />
       </div>
 

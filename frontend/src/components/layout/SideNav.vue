@@ -3,10 +3,15 @@ import KudiLogo from '../ui/KudiLogo.vue'
 
 const emit = defineEmits<{ navigate: [] }>()
 
+const ACTIVE = '!bg-white/10 !text-white'
+
 const items = [
   {
     name: 'Dashboard',
     to: '/',
+    // Only the dashboard matches exactly; every other path starts with "/",
+    // so prefix matching would keep it permanently highlighted.
+    exact: true,
     icon: 'M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z',
   },
   {
@@ -38,13 +43,14 @@ const items = [
       <KudiLogo light />
     </div>
 
-    <nav class="flex-1 space-y-1 px-3 py-4" aria-label="Main navigation">
+    <nav id="main-nav" class="flex-1 space-y-1 px-3 py-4" aria-label="Main navigation">
       <RouterLink
         v-for="item in items"
         :key="item.to"
         :to="item.to"
         class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-        exact-active-class="!bg-white/10 !text-white"
+        :active-class="item.exact ? undefined : ACTIVE"
+        :exact-active-class="ACTIVE"
         @click="emit('navigate')"
       >
         <svg

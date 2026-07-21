@@ -24,6 +24,23 @@ const labels = computed(() =>
   ),
 )
 
+const summary = computed(() => {
+  const points = props.series
+  if (points.length === 0) return 'Daily payment volume chart. No data available.'
+
+  const total = points.reduce((sum, p) => sum + p.volume, 0)
+  const peak = points.reduce((best, p) => (p.volume > best.volume ? p : best), points[0]!)
+
+  return (
+    `Daily payment volume over the last ${points.length} days. ` +
+    `Total ${formatMoney(total)}. ` +
+    `Busiest day ${new Date(peak.date).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+    })} at ${formatMoney(peak.volume)}.`
+  )
+})
+
 const data = computed(() => ({
   labels: labels.value,
   datasets: [
@@ -82,7 +99,17 @@ const options = {
 </script>
 
 <template>
-  <div class="h-64">
-    <Line :data="data" :options="options" aria-label="Daily payment volume, last 30 days" />
+  <div>
+    <div class="h-64">
+      <Line
+        :data="data"
+        :options="options"
+        role="img"
+        :aria-label="summary"
+      />
+    </div>
+    <!-- A canvas exposes nothing to assistive tech, so restate the series as
+         text. Screen reader users get the totals and the peak day. -->
+    <p class="sr-only">{{ summary }}</p>
   </div>
 </template>

@@ -45,7 +45,7 @@ async function submit(): Promise<void> {
   <div class="flex min-h-screen items-center justify-center bg-canvas px-4">
     <div class="w-full max-w-sm">
       <div class="mb-8 text-center">
-        <KudiLogo class="text-2xl" />
+        <h1><KudiLogo class="text-2xl" /></h1>
         <p class="mt-2 text-sm text-slate-500">Merchant Wallet &amp; Settlement Dashboard</p>
       </div>
 
@@ -72,7 +72,7 @@ async function submit(): Promise<void> {
 
           <BaseButton type="submit" class="w-full" :loading="submitting">Sign in</BaseButton>
 
-          <p class="text-center text-xs text-slate-400">
+          <p class="text-center text-xs text-slate-500">
             Demo credentials are prefilled — just sign in.
           </p>
         </form>

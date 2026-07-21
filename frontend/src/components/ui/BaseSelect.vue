@@ -17,22 +17,37 @@ const id = useId()
       {{ label }}
       <span v-if="required" class="text-red-500" aria-hidden="true">*</span>
     </label>
-    <select
-      :id="id"
-      v-model="model"
-      :required="required"
-      :aria-invalid="!!error"
-      :aria-describedby="error ? `${id}-error` : undefined"
-      :class="[
-        'w-full appearance-none rounded-lg border bg-white px-3 py-2 text-sm text-ink transition-colors',
-        'focus:outline-2 focus:outline-offset-1',
-        error
-          ? 'border-red-400 focus:outline-red-500'
-          : 'border-line focus:outline-primary-600 hover:border-slate-300',
-      ]"
-    >
-      <slot />
-    </select>
+    <div class="relative">
+      <select
+        :id="id"
+        v-model="model"
+        :required="required"
+        :aria-invalid="!!error"
+        :aria-describedby="error ? `${id}-error` : undefined"
+        :class="[
+          'w-full appearance-none rounded-lg border bg-white py-2 pr-9 pl-3 text-sm text-ink transition-colors',
+          'focus:outline-2 focus:outline-offset-1',
+          error
+            ? 'border-red-400 focus:outline-red-500'
+            : 'border-line focus:outline-primary-600 hover:border-slate-300',
+        ]"
+      >
+        <slot />
+      </select>
+      <!-- appearance-none removes the native arrow, so draw the affordance back. -->
+      <svg
+        class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-slate-500"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M5.22 8.22a.75.75 0 011.06 0L10 11.94l3.72-3.72a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.22 9.28a.75.75 0 010-1.06z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </div>
     <p v-if="error" :id="`${id}-error`" class="mt-1.5 text-sm text-red-600" role="alert">
       {{ error }}
     </p>

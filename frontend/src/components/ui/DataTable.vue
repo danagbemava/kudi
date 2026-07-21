@@ -16,7 +16,7 @@ const emit = defineEmits<{ retry: [] }>()
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-xl border border-line bg-white">
+  <div class="overflow-hidden rounded-xl border border-line bg-white" :aria-busy="loading">
     <div class="overflow-x-auto">
       <table class="w-full text-left text-sm">
         <thead>

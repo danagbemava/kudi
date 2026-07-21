@@ -158,13 +158,13 @@ async function toggleStatus(): Promise<void> {
               >
                 <div class="min-w-0 flex-1">
                   <p class="font-mono truncate text-xs text-slate-500">{{ transaction.reference }}</p>
-                  <p class="text-xs text-slate-400">{{ formatDateTime(transaction.created_at) }}</p>
+                  <p class="text-xs text-slate-500">{{ formatDateTime(transaction.created_at) }}</p>
                 </div>
                 <div class="text-right">
                   <p class="font-display text-sm font-semibold text-ink">
                     {{ formatMoney(transaction.gross_amount) }}
                   </p>
-                  <p class="text-xs text-slate-400">net {{ formatMoney(transaction.net_amount) }}</p>
+                  <p class="text-xs text-slate-500">net {{ formatMoney(transaction.net_amount) }}</p>
                 </div>
                 <StatusBadge :status="transaction.status" />
               </li>
@@ -189,7 +189,7 @@ async function toggleStatus(): Promise<void> {
               >
                 <div class="min-w-0 flex-1">
                   <p class="font-mono truncate text-xs text-slate-500">{{ settlement.reference }}</p>
-                  <p class="text-xs text-slate-400">{{ formatDate(settlement.settled_at) }}</p>
+                  <p class="text-xs text-slate-500">{{ formatDate(settlement.settled_at) }}</p>
                 </div>
                 <p class="font-display text-sm font-semibold text-ink">
                   {{ formatMoney(settlement.amount) }}

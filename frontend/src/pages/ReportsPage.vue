@@ -146,21 +146,21 @@ const activePreset = ref('All time')
               <span class="size-2.5 rounded-full bg-green-500" aria-hidden="true" />
               <dt class="text-sm text-slate-500">Successful</dt>
               <dd class="ml-auto text-sm font-semibold text-ink">
-                {{ counts.successful }} <span class="font-normal text-slate-400">({{ share('successful') }}%)</span>
+                {{ counts.successful }} <span class="font-normal text-slate-500">({{ share('successful') }}%)</span>
               </dd>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="size-2.5 rounded-full bg-amber-400" aria-hidden="true" />
               <dt class="text-sm text-slate-500">Pending</dt>
               <dd class="ml-auto text-sm font-semibold text-ink">
-                {{ counts.pending }} <span class="font-normal text-slate-400">({{ share('pending') }}%)</span>
+                {{ counts.pending }} <span class="font-normal text-slate-500">({{ share('pending') }}%)</span>
               </dd>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="size-2.5 rounded-full bg-red-500" aria-hidden="true" />
               <dt class="text-sm text-slate-500">Failed</dt>
               <dd class="ml-auto text-sm font-semibold text-ink">
-                {{ counts.failed }} <span class="font-normal text-slate-400">({{ share('failed') }}%)</span>
+                {{ counts.failed }} <span class="font-normal text-slate-500">({{ share('failed') }}%)</span>
               </dd>
             </div>
           </dl>

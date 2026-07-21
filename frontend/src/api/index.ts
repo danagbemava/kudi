@@ -17,6 +17,8 @@ export interface MerchantFilters {
   search?: string
   status?: MerchantStatus | ''
   page?: number
+  /** Backend clamps this to 100. */
+  per_page?: number
 }
 
 export interface TransactionFilters {

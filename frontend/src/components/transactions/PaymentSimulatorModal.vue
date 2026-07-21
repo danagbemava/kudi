@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { api } from '../../api'
 import { ApiValidationError, toApiError } from '../../api/client'
-import type { Transaction } from '../../api/types'
+import type { Merchant, Transaction } from '../../api/types'
 import { useToast } from '../../composables/useToast'
-import { useMerchantsStore } from '../../stores/merchants'
 import { useTransactionsStore } from '../../stores/transactions'
 import { feeFor, formatMoney, parseAmount } from '../../utils/money'
 import BaseButton from '../ui/BaseButton.vue'
@@ -15,9 +15,14 @@ import StatusBadge from '../ui/StatusBadge.vue'
 const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{ close: []; completed: [] }>()
 
-const merchants = useMerchantsStore()
 const transactions = useTransactionsStore()
 const toast = useToast()
+
+// Held locally rather than in the merchants store: this dropdown needs every
+// active merchant, while the store holds one filtered, paginated page for the
+// merchants screen. Sharing it truncated the options and clobbered that page.
+const activeMerchants = ref<Merchant[]>([])
+const merchantsLoading = ref(false)
 
 const merchantId = ref<number | null>(null)
 const amountInput = ref('')
@@ -38,10 +43,22 @@ watch(
       errors.value = {}
       phase.value = 'idle'
       result.value = null
-      merchants.fetch({ status: 'active' }).catch(() => {})
+      loadMerchants()
     }
   },
 )
+
+async function loadMerchants(): Promise<void> {
+  merchantsLoading.value = true
+  try {
+    const page = await api.merchants({ status: 'active', per_page: 100 })
+    activeMerchants.value = page.data
+  } catch (error) {
+    toast.error(toApiError(error).message)
+  } finally {
+    merchantsLoading.value = false
+  }
+}
 
 function generateReference(): string {
   const random = Array.from({ length: 8 }, () =>
@@ -49,8 +66,6 @@ function generateReference(): string {
   ).join('')
   return `PAY-${random}`
 }
-
-const activeMerchants = computed(() => merchants.items.filter((m) => m.status === 'active'))
 
 const amountMinor = computed(() => parseAmount(amountInput.value))
 const fee = computed(() => (amountMinor.value !== null ? feeFor(amountMinor.value) : null))
@@ -126,7 +141,7 @@ async function submit(): Promise<void> {
           <dt class="font-medium text-ink">
             {{ result.status === 'successful' ? 'Credited to wallet' : 'Would have credited' }}
           </dt>
-          <dd class="font-display font-semibold" :class="result.status === 'successful' ? 'text-green-600' : 'text-slate-400 line-through'">
+          <dd class="font-display font-semibold" :class="result.status === 'successful' ? 'text-green-600' : 'text-slate-500 line-through'">
             {{ formatMoney(result.net_amount) }}
           </dd>
         </div>
@@ -148,7 +163,9 @@ async function submit(): Promise<void> {
         required
         :error="errors.merchant_id"
       >
-        <option :value="null" disabled>Choose an active merchant…</option>
+        <option :value="null" disabled>
+          {{ merchantsLoading ? 'Loading merchants…' : 'Choose an active merchant…' }}
+        </option>
         <option v-for="merchant in activeMerchants" :key="merchant.id" :value="merchant.id">
           {{ merchant.business_name }}
         </option>
