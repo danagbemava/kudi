@@ -88,6 +88,7 @@ const activePreset = ref('All time')
         <input
           v-model="from"
           type="date"
+          :max="to || undefined"
           class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
           @change="activePreset = ''"
         />
@@ -97,6 +98,7 @@ const activePreset = ref('All time')
         <input
           v-model="to"
           type="date"
+          :min="from || undefined"
           class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm text-ink hover:border-slate-300 focus:outline-2 focus:outline-offset-1 focus:outline-primary-600"
           @change="activePreset = ''"
         />

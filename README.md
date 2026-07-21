@@ -62,6 +62,18 @@ cd frontend && npm run lint       # ESLint, incl. vue/no-undef-components
 - **SPA + API, same-origin cookies.** The Vite dev server and the Docker nginx both proxy `/api`, `/login`, `/logout`, and `/sanctum` to Laravel, so the Sanctum session cookie is always first-party — no cross-origin cookie fragility.
 - **State management** is Pinia stores per domain (auth, dashboard, merchants, transactions, settlements) over a typed API client with a single error-normalization path: 422s map to field errors, everything else to toast-able messages.
 
+## Accessibility
+
+Targeting WCAG 2.1 AA. Audited by hand across contrast, keyboard operability, forms, ARIA, landmarks, and SPA-specific concerns.
+
+- **Contrast** — every text/background pair was measured, not eyeballed. Secondary text on light surfaces uses `slate-500` (4.76:1); the same role on the dark hero cards uses `slate-400` (6.7:1), because `slate-500` there would fall to 3.6:1 and fail. Disabled controls are exempt per SC 1.4.3.
+- **Keyboard** — skip-to-content link, visible focus rings on every interactive element, focus trapped in dialogs and restored to the trigger on close. The mobile nav drawer is a real dialog: Escape closes it, focus moves in and returns.
+- **Forms** — every control has a bound `<label>`; server validation maps to per-field messages tied via `aria-describedby` with `aria-invalid`, and errors announce through `role="alert"`.
+- **Screen readers** — route changes announce through a live region (SPA navigation is otherwise silent), the payment fee preview is an `aria-live` region so the net figure is spoken as it changes, and the volume chart carries a text summary because a `<canvas>` exposes nothing to assistive tech.
+- **Motion** — `prefers-reduced-motion` disables animation and transitions globally.
+
+Known gaps: no automated axe/Lighthouse run (would be the next step in CI), and the tables are not sortable so no sort-state announcement is needed yet.
+
 ## Assumptions
 
 - **One wallet per merchant** (single currency, GHS). The brief consistently says "the merchant wallet"; wallets sit in their own table so multi-currency would be an additive change.
