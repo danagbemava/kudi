@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { api } from '../api'
+import { isUnauthorized, notifySessionExpired } from '../api/client'
 import type { User } from '../api/types'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -28,8 +29,36 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout(): Promise<void> {
     await api.logout()
-    user.value = null
+    clear()
   }
 
-  return { user, checked, check, login, logout }
+  /**
+   * Drops the local session without calling the server — for when the server
+   * has already told us the session is gone. `checked` stays true so the
+   * router guard doesn't fire a pointless request on the way to login.
+   */
+  function clear(): void {
+    user.value = null
+    checked.value = true
+  }
+
+  /**
+   * Re-checks the session against the server. Used when the tab regains
+   * focus, so a session that expired while the tab sat in the background is
+   * caught on return rather than on the next click.
+   */
+  async function revalidate(): Promise<void> {
+    if (!user.value) return
+
+    try {
+      user.value = await api.user()
+    } catch (error) {
+      // /api/user is a probe URL, so the interceptor deliberately ignores its
+      // 401 — a guest hitting the router guard must not be "signed out". Here
+      // we know a session existed, so an expiry is real and handled directly.
+      if (isUnauthorized(error)) notifySessionExpired()
+    }
+  }
+
+  return { user, checked, check, login, logout, clear, revalidate }
 })

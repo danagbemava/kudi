@@ -50,8 +50,17 @@ watch(drawerOpen, async (open) => {
   }
 })
 
+// A session can lapse while the tab is in the background. Re-checking on
+// return catches it there and then, rather than on the user's next click.
+function onVisibilityChange(): void {
+  if (document.visibilityState === 'visible') auth.revalidate()
+}
+
+document.addEventListener('visibilitychange', onVisibilityChange)
+
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onDrawerKeydown)
+  document.removeEventListener('visibilitychange', onVisibilityChange)
   document.getElementById('app')?.removeAttribute('inert')
 })
 

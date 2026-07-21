@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios'
+import axios, { type AxiosError } from 'axios'
 import type { ValidationErrors } from './types'
 
 export const http = axios.create({
@@ -18,6 +18,51 @@ export async function ensureCsrf(): Promise<void> {
   }
 }
 
+/**
+ * Requests that are *expected* to 401 for a signed-out visitor. Treating these
+ * as an expiry would bounce a guest between the router guard and the login
+ * page forever.
+ */
+const SESSION_PROBES = ['/api/user', '/api/login']
+
+export function shouldSignOut(status: number | undefined, url = ''): boolean {
+  if (status !== 401) return false
+
+  return !SESSION_PROBES.some((probe) => url.endsWith(probe))
+}
+
+let onExpired: (() => void) | null = null
+
+/**
+ * Registered once at start-up. Kept as a callback rather than importing the
+ * router and auth store here, which would be a cycle: store → api → client.
+ */
+export function onSessionExpired(handler: () => void): void {
+  onExpired = handler
+}
+
+/**
+ * Exported so a deliberate session re-check can reuse the same path — its
+ * request is a probe URL, so the interceptor will not fire for it.
+ */
+export function notifySessionExpired(): void {
+  csrfReady = false // the CSRF token died with the session
+  onExpired?.()
+}
+
+export function isUnauthorized(error: unknown): boolean {
+  return axios.isAxiosError(error) && error.response?.status === 401
+}
+
+http.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (shouldSignOut(error.response?.status, error.config?.url)) notifySessionExpired()
+
+    return Promise.reject(error)
+  },
+)
+
 export class ApiValidationError extends Error {
   fields: Record<string, string[]>
 
@@ -36,7 +81,7 @@ export class ApiValidationError extends Error {
  * messages; everything else becomes an Error with a human-readable message.
  */
 export function toApiError(error: unknown): Error {
-  if (error instanceof AxiosError) {
+  if (axios.isAxiosError(error)) {
     const status = error.response?.status
 
     if (status === 422) {

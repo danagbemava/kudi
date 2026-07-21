@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ApiValidationError, toApiError } from '../api/client'
 import BaseButton from '../components/ui/BaseButton.vue'
@@ -10,6 +10,8 @@ import { useAuthStore } from '../stores/auth'
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
+
+const expired = computed(() => route.query.reason === 'expired')
 
 const email = ref('admin@kudi.test')
 const password = ref('password')
@@ -52,6 +54,14 @@ async function submit(): Promise<void> {
       <div class="overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
         <div class="kente-thread" aria-hidden="true" />
         <form class="space-y-4 p-6" novalidate @submit.prevent="submit">
+          <p
+            v-if="expired"
+            class="rounded-lg bg-gold-wash px-3 py-2 text-sm text-ink-soft"
+            role="status"
+          >
+            Your session timed out. Sign in to pick up where you left off.
+          </p>
+
           <BaseInput
             v-model="email"
             label="Email"
