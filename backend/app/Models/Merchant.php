@@ -13,6 +13,10 @@ class Merchant extends Model
 {
     use HasFactory;
 
+    protected $attributes = [
+        'status' => 'active',
+    ];
+
     protected $fillable = [
         'name',
         'email',

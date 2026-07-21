@@ -39,6 +39,15 @@ class PaymentService
         $succeeded = Lottery::odds($chances, $outOf)->choose();
 
         return DB::transaction(function () use ($transaction, $succeeded) {
+            // Re-read under a row lock and re-check the status inside the
+            // transaction: two concurrent process calls must not both see
+            // "pending" and double-credit the wallet.
+            $transaction = Transaction::query()->lockForUpdate()->findOrFail($transaction->id);
+
+            if (! $transaction->isPending()) {
+                return $transaction;
+            }
+
             if ($succeeded) {
                 $wallet = $transaction->merchant->wallet()->lockForUpdate()->first();
                 $wallet->increment('balance', $transaction->net_amount);
