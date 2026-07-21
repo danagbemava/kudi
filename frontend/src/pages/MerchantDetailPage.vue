@@ -106,9 +106,19 @@ async function toggleStatus(): Promise<void> {
             · registered {{ formatDate(merchant.created_at) }}
           </p>
         </div>
-        <BaseButton :variant="deactivating ? 'danger' : 'primary'" @click="confirmOpen = true">
-          {{ deactivating ? 'Deactivate' : 'Activate' }}
-        </BaseButton>
+        <!-- Kept apart from the identity block: a control that stops a
+             merchant taking payments should not sit flush against their name
+             as if it were part of the heading. -->
+        <div
+          class="flex items-center gap-3 rounded-lg border border-line bg-white px-3 py-2 sm:px-4"
+        >
+          <p class="hidden text-xs text-zinc-500 sm:block">
+            {{ deactivating ? 'Accepting payments' : 'Not accepting payments' }}
+          </p>
+          <BaseButton :variant="deactivating ? 'danger' : 'primary'" @click="confirmOpen = true">
+            {{ deactivating ? 'Deactivate' : 'Activate' }}
+          </BaseButton>
+        </div>
       </div>
 
       <!-- Stats -->
@@ -148,6 +158,7 @@ async function toggleStatus(): Promise<void> {
             <div v-if="merchant.recent_transactions.length === 0" class="px-4 py-10">
               <EmptyState
                 :level="4"
+                icon="transactions"
                 title="No transactions"
                 message="Payments to this merchant will appear here."
               />

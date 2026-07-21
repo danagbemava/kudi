@@ -65,11 +65,19 @@ export interface DashboardData {
     settled: number
     merchant_count: number
     pending_count: number
+    /** Gross value of payments still in flight. */
+    pending_amount: number
   }
-  volume_series: { date: string; volume: number; fees: number }[]
+  volume_series: DaySeriesPoint[]
   recent_transactions: Transaction[]
   /** Merchants holding float, largest first — drives the settlement band. */
   unsettled: { id: number; business_name: string; wallet_balance: number }[]
+}
+
+export interface DaySeriesPoint {
+  date: string
+  volume: number
+  fees: number
 }
 
 export interface ReportSummary {
@@ -77,6 +85,8 @@ export interface ReportSummary {
   successful_volume: number
   total_settled: number
   transaction_counts: Record<TransactionStatus, number>
+  /** Daily volume and fees across the selected range. */
+  series: DaySeriesPoint[]
 }
 
 export interface User {

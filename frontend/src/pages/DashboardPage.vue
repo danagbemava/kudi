@@ -72,7 +72,7 @@ onMounted(() => {
         />
       </section>
 
-      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Payment volume"
           :value="formatMoney(dashboard.data?.totals.payment_volume ?? 0)"
@@ -86,9 +86,15 @@ onMounted(() => {
           :loading="dashboard.loading"
         />
         <StatCard
+          label="In flight"
+          :value="formatMoney(dashboard.data?.totals.pending_amount ?? 0)"
+          :sub="`${dashboard.data?.totals.pending_count ?? 0} pending — not yet in a wallet`"
+          :loading="dashboard.loading"
+        />
+        <StatCard
           label="Platform fees"
           :value="formatMoney(dashboard.data?.totals.platform_fees ?? 0)"
-          :sub="`1.5% per payment · ${dashboard.data?.totals.pending_count ?? 0} pending`"
+          sub="1.5% of successful payments"
           :loading="dashboard.loading"
         />
       </div>
@@ -128,6 +134,7 @@ onMounted(() => {
           >
             <EmptyState
               :level="3"
+              icon="transactions"
               title="No transactions yet"
               message="Simulate a customer payment to see it appear here."
             >

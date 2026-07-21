@@ -7,7 +7,9 @@ use App\Models\Merchant;
 use App\Models\Settlement;
 use App\Models\Transaction;
 use App\Models\Wallet;
+use Carbon\CarbonImmutable;
 use DateTimeInterface;
+use Illuminate\Support\Carbon;
 
 /**
  * Read-side aggregation for the dashboard and reports.
@@ -19,10 +21,14 @@ use DateTimeInterface;
  */
 class ReportingService
 {
+    /** Longest series the reports endpoint will return. */
+    private const MAX_SERIES_DAYS = 180;
+
     /** Headline figures for the dashboard. */
     public function totals(): array
     {
         $successful = Transaction::query()->withStatus(TransactionStatus::Successful->value);
+        $pending = Transaction::query()->withStatus(TransactionStatus::Pending->value);
 
         return [
             'wallet_balance' => (int) Wallet::sum('balance'),
@@ -30,9 +36,10 @@ class ReportingService
             'platform_fees' => (int) $successful->clone()->sum('fee_amount'),
             'settled' => (int) Settlement::sum('amount'),
             'merchant_count' => Merchant::count(),
-            'pending_count' => Transaction::query()
-                ->withStatus(TransactionStatus::Pending->value)
-                ->count(),
+            'pending_count' => $pending->clone()->count(),
+            // What is still in flight. Pending money is float that has not
+            // landed in a wallet yet, so it changes what settling now catches.
+            'pending_amount' => (int) $pending->clone()->sum('gross_amount'),
         ];
     }
 
@@ -44,11 +51,28 @@ class ReportingService
      */
     public function volumeSeries(int $days = 30): array
     {
-        $start = now()->subDays($days - 1)->startOfDay();
+        return $this->dailySeries(now()->subDays($days - 1)->startOfDay(), now()->endOfDay());
+    }
+
+    /**
+     * Daily volume and fees between two dates, zero-filled.
+     *
+     * @return array<int, array{date: string, volume: int, fees: int}>
+     */
+    private function dailySeries(DateTimeInterface $from, DateTimeInterface $to): array
+    {
+        $start = CarbonImmutable::instance(Carbon::instance($from))->startOfDay();
+        $end = CarbonImmutable::instance(Carbon::instance($to))->startOfDay();
+
+        // Bound the response: an "all time" range would otherwise return a
+        // point per day since the first payment.
+        $days = min($start->diffInDays($end) + 1, self::MAX_SERIES_DAYS);
+        $start = $end->subDays($days - 1);
 
         $byDay = Transaction::query()
             ->withStatus(TransactionStatus::Successful->value)
-            ->where('created_at', '>=', $start)
+            ->whereDate('created_at', '>=', $start)
+            ->whereDate('created_at', '<=', $end)
             ->selectRaw('DATE(created_at) as day, SUM(gross_amount) as volume, SUM(fee_amount) as fees')
             ->groupBy('day')
             ->get()
@@ -56,7 +80,7 @@ class ReportingService
 
         return collect(range(0, $days - 1))
             ->map(function (int $offset) use ($start, $byDay) {
-                $date = $start->clone()->addDays($offset)->toDateString();
+                $date = $start->addDays($offset)->toDateString();
 
                 return [
                     'date' => $date,
@@ -111,6 +135,10 @@ class ReportingService
                 'pending' => $countOf(TransactionStatus::Pending),
                 'failed' => $countOf(TransactionStatus::Failed),
             ],
+            'series' => $this->dailySeries(
+                $from ?? now()->subDays(29)->startOfDay(),
+                $to ?? now()->endOfDay(),
+            ),
         ];
     }
 }

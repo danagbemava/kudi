@@ -14,9 +14,18 @@ import { formatMoney, formatMoneyCompact } from '../../utils/money'
 
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip)
 
-const props = defineProps<{
-  series: { date: string; volume: number }[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    series: { date: string; volume: number; fees: number }[]
+    /** Which figure to plot. Volume on the dashboard, fees on reports. */
+    metric?: 'volume' | 'fees'
+    /** Names the series in the text alternative. */
+    label?: string
+  }>(),
+  { metric: 'volume', label: 'payment volume' },
+)
+
+const values = computed(() => props.series.map((point) => point[props.metric]))
 
 const labels = computed(() =>
   props.series.map((point) =>
@@ -26,18 +35,19 @@ const labels = computed(() =>
 
 const summary = computed(() => {
   const points = props.series
-  if (points.length === 0) return 'Daily payment volume chart. No data available.'
+  if (points.length === 0) return `Daily ${props.label} chart. No data available.`
 
-  const total = points.reduce((sum, p) => sum + p.volume, 0)
-  const peak = points.reduce((best, p) => (p.volume > best.volume ? p : best), points[0]!)
+  const total = values.value.reduce((sum, v) => sum + v, 0)
+  const peakIndex = values.value.indexOf(Math.max(...values.value))
+  const peak = { date: points[peakIndex]!.date, value: values.value[peakIndex]! }
 
   return (
-    `Daily payment volume over the last ${points.length} days. ` +
+    `Daily ${props.label} over ${points.length} days. ` +
     `Total ${formatMoney(total)}. ` +
     `Busiest day ${new Date(peak.date).toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'long',
-    })} at ${formatMoney(peak.volume)}.`
+    })} at ${formatMoney(peak.value)}.`
   )
 })
 
@@ -45,7 +55,7 @@ const data = computed(() => ({
   labels: labels.value,
   datasets: [
     {
-      data: props.series.map((point) => point.volume),
+      data: values.value,
       borderColor: '#14543A',
       borderWidth: 2,
       pointRadius: 0,
@@ -101,7 +111,7 @@ const options = {
 <template>
   <div>
     <div class="h-64">
-      <Line :data="data" :options="options" role="img" aria-label="Payment volume chart" />
+      <Line :data="data" :options="options" role="img" :aria-label="`${label} chart`" />
     </div>
     <!-- A canvas exposes nothing to assistive tech, so restate the series as
          text. Screen reader users get the totals and the peak day. -->

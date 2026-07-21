@@ -166,6 +166,7 @@ function clearFilters(): void {
 
       <template #empty>
         <EmptyState
+          icon="wallet"
           title="No settlements found"
           :message="
             from || to

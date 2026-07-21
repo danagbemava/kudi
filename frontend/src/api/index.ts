@@ -92,6 +92,19 @@ export const api = {
     return data.data
   },
 
+  /** Activate or deactivate several merchants in one request. */
+  async setMerchantStatuses(
+    ids: number[],
+    status: MerchantStatus,
+  ): Promise<{ updated: number; status: MerchantStatus }> {
+    await ensureCsrf()
+    const { data } = await http.patch<{ data: { updated: number; status: MerchantStatus } }>(
+      '/api/merchants/status',
+      { ids, status },
+    )
+    return data.data
+  },
+
   async setMerchantStatus(id: number, status: MerchantStatus): Promise<Merchant> {
     const { data } = await http.patch<{ data: Merchant }>(`/api/merchants/${id}/status`, { status })
     return data.data

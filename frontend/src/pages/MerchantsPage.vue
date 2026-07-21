@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { useId } from 'vue'
 import type { Merchant, MerchantStatus } from '../api/types'
+import BulkStatusBar from '../components/merchants/BulkStatusBar.vue'
 import MerchantFormModal from '../components/merchants/MerchantFormModal.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import DataTable from '../components/ui/DataTable.vue'
@@ -47,7 +49,34 @@ function onCreated(merchant: Merchant): void {
   load()
 }
 
-const columns = ['Business', 'Contact', 'Institution', 'Wallet balance', 'Status']
+const selected = ref<number[]>([])
+const selectAllId = useId()
+
+// Selection is dropped whenever the visible set changes: keeping ids the user
+// can no longer see selected would make the bulk count a lie.
+watch(
+  () => merchants.items,
+  () => (selected.value = []),
+)
+
+const allVisibleSelected = computed(
+  () => merchants.items.length > 0 && selected.value.length === merchants.items.length,
+)
+
+function toggleAll(checked: boolean): void {
+  selected.value = checked ? merchants.items.map((m) => m.id) : []
+}
+
+function toggle(id: number, checked: boolean): void {
+  selected.value = checked ? [...selected.value, id] : selected.value.filter((s) => s !== id)
+}
+
+function afterBulk(): void {
+  selected.value = []
+  load()
+}
+
+const columns = ['', 'Business', 'Contact', 'Institution', 'Wallet balance', 'Status']
 
 // Search sits outside the collapsible panel, so it is not counted here.
 const activeFilterCount = computed(() => (status.value ? 1 : 0))
@@ -103,6 +132,8 @@ function clearFilters(): void {
       </template>
     </FilterBar>
 
+    <BulkStatusBar :selected="selected" @done="afterBulk" @clear="selected = []" />
+
     <DataTable
       :columns="columns"
       label="Merchants"
@@ -112,11 +143,32 @@ function clearFilters(): void {
       :empty="merchants.items.length === 0"
       @retry="load"
     >
+      <template #header-0>
+        <input
+          :id="selectAllId"
+          type="checkbox"
+          class="size-4 rounded border-field text-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+          :checked="allVisibleSelected"
+          aria-label="Select all merchants on this page"
+          @change="toggleAll(($event.target as HTMLInputElement).checked)"
+        />
+      </template>
+
       <tr
         v-for="merchant in merchants.items"
         :key="merchant.id"
         class="transition-colors hover:bg-zinc-50/70"
+        :class="selected.includes(merchant.id) && 'bg-forest-wash/60'"
       >
+        <td class="py-3 pl-4">
+          <input
+            type="checkbox"
+            class="size-4 rounded border-field text-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+            :checked="selected.includes(merchant.id)"
+            :aria-label="`Select ${merchant.business_name}`"
+            @change="toggle(merchant.id, ($event.target as HTMLInputElement).checked)"
+          />
+        </td>
         <td class="px-4 py-3">
           <RouterLink
             :to="`/merchants/${merchant.id}`"
@@ -167,6 +219,7 @@ function clearFilters(): void {
 
       <template #empty>
         <EmptyState
+          :icon="search || status ? 'search' : 'merchants'"
           title="No merchants found"
           :message="
             search || status

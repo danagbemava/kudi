@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\TransactionStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BulkMerchantStatusRequest;
 use App\Http\Requests\StoreMerchantRequest;
 use App\Http\Resources\MerchantResource;
 use App\Http\Resources\SettlementResource;
@@ -60,6 +61,24 @@ class MerchantController extends Controller
         ];
 
         return response()->json(['data' => $profile]);
+    }
+
+    /**
+     * Activate or deactivate several merchants at once. Reports how many rows
+     * actually changed, not how many were named — re-applying a status a
+     * merchant already has is not a change, and saying otherwise would make
+     * the confirmation message untrue.
+     */
+    public function bulkStatus(BulkMerchantStatusRequest $request): JsonResponse
+    {
+        $status = $request->string('status')->toString();
+
+        $updated = Merchant::query()
+            ->whereIn('id', $request->input('ids'))
+            ->where('status', '!=', $status)
+            ->update(['status' => $status]);
+
+        return response()->json(['data' => ['updated' => $updated, 'status' => $status]]);
     }
 
     public function updateStatus(Request $request, Merchant $merchant): MerchantResource

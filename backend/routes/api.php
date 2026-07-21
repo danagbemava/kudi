@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/merchants', [MerchantController::class, 'index']);
     Route::post('/merchants', [MerchantController::class, 'store']);
+    // Declared before the {merchant} route so "status" is not read as an id.
+    Route::patch('/merchants/status', [MerchantController::class, 'bulkStatus']);
     Route::get('/merchants/{merchant}', [MerchantController::class, 'show']);
     Route::patch('/merchants/{merchant}/status', [MerchantController::class, 'updateStatus']);
 

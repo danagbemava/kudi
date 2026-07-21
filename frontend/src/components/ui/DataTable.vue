@@ -52,12 +52,14 @@ watch(
         <thead>
           <tr class="border-b border-line bg-zinc-50/80">
             <th
-              v-for="column in columns"
-              :key="column"
+              v-for="(column, index) in columns"
+              :key="index"
               scope="col"
               class="px-4 py-3 text-xs font-semibold tracking-wide text-zinc-500 uppercase"
             >
-              {{ column }}
+              <!-- Lets a page put a control in a header cell (e.g. select-all)
+                   while every other column keeps its plain label. -->
+              <slot :name="`header-${index}`">{{ column }}</slot>
             </th>
           </tr>
         </thead>

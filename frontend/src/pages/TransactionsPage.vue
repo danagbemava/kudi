@@ -207,6 +207,7 @@ function clearFilters(): void {
 
       <template #empty>
         <EmptyState
+          :icon="hasFilters() ? 'search' : 'transactions'"
           title="No transactions found"
           :message="
             hasFilters()

@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { api } from '../api'
 import { toApiError } from '../api/client'
 import type { ReportSummary } from '../api/types'
+import VolumeChart from '../components/charts/VolumeChart.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import StatCard from '../components/ui/StatCard.vue'
 import { formatMoney } from '../utils/money'
@@ -38,7 +39,9 @@ function setRange(days: number | null): void {
 
   const now = new Date()
   const start = new Date(now)
-  start.setDate(start.getDate() - days)
+  // Inclusive of both ends, so "Last 7 days" spans 7 days counting today —
+  // subtracting a full 7 would return 8 points.
+  start.setDate(start.getDate() - (days - 1))
   from.value = start.toISOString().slice(0, 10)
   to.value = now.toISOString().slice(0, 10)
 }
@@ -146,6 +149,23 @@ function selectPreset(preset: { label: string; days: number | null }): void {
           :loading="loading"
         />
       </div>
+
+      <!-- Fees over the selected period: the totals say how much, this says
+           whether it is growing. -->
+      <section class="mt-6 rounded-xl border border-line bg-white p-5">
+        <h2 class="font-display text-sm font-semibold text-ink">Platform fees earned</h2>
+        <div v-if="loading" class="mt-4 h-56 animate-pulse rounded-lg bg-zinc-100" />
+        <VolumeChart
+          v-else-if="summary && summary.series.length > 0"
+          class="mt-4"
+          :series="summary.series"
+          metric="fees"
+          label="platform fees"
+        />
+        <p v-else class="mt-4 text-sm text-zinc-500">
+          No payments in this period, so there are no fees to chart.
+        </p>
+      </section>
 
       <!-- Status distribution -->
       <section class="mt-6 rounded-xl border border-line bg-white p-5">

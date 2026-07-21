@@ -14,6 +14,7 @@ function mountButton(walletBalance: number, unsettledCount = 3) {
       settled: 0,
       merchant_count: 12,
       pending_count: 0,
+      pending_amount: 0,
     },
     volume_series: [],
     recent_transactions: [],

@@ -37,8 +37,8 @@ Open **http://localhost:5173** — the Vite dev server proxies API calls to Lara
 ### Tests
 
 ```bash
-cd backend && php artisan test    # 59 tests — business rules, API, auth, reporting
-cd frontend && npm test           # 42 tests — money math, components, stores, nav, session
+cd backend && php artisan test    # 68 tests — business rules, API, auth, reporting
+cd frontend && npm test           # 47 tests — money math, components, stores, nav, session
 cd frontend && npm run lint       # ESLint, incl. vue/no-undef-components
 cd frontend && npm run format:check   # Prettier, incl. Tailwind class order
 cd backend  && composer format:check  # Laravel Pint
@@ -65,10 +65,10 @@ The interface is built around the settlement cycle rather than around a grid of 
 ## What's included
 
 - **Dashboard** — total merchant balances, payment volume, settlement totals, platform fees, a 30-day volume chart, and recent transactions.
-- **Merchants** — searchable/filterable list, registration with validation (bank *or mobile money* settlement institution), activate/deactivate with confirmation, and a detail page with wallet, stats, transactions, and settlements.
+- **Merchants** — searchable/filterable list, registration with validation (bank *or mobile money* settlement institution), activate/deactivate with confirmation individually or in bulk, and a detail page with wallet, stats, transactions, and settlements.
 - **Payments** — a simulator that shows the gross → 1.5% fee → net breakdown live as you type, creates a `pending` transaction, then resolves it ~2s later via a simulated gateway callback (~90% success). Successful payments credit the merchant wallet with the net amount.
 - **Settlements** — outstanding-balance banner, a manually triggered settlement run with a confirmation showing the exact amount to be moved, and batch history. Views update without a page reload.
-- **Reports** — platform fees earned, successful volume, settlement totals, and a transaction-outcome breakdown, with date-range presets and custom ranges.
+- **Reports** — platform fees earned, successful volume, settlement totals, a fees trend across the selected period, and a transaction-outcome breakdown, with date-range presets and custom ranges.
 - **Auth** — session login via Laravel Sanctum's SPA cookie flow; all API routes are guarded. Sessions last `SESSION_LIFETIME` minutes (120 by default). When one lapses, the first 401 signs the user out, sends them to the login page with the page they were on preserved, and says why — rather than leaving them on a screen where every action silently fails. Returning to a backgrounded tab re-checks the session, so an expiry is caught on return rather than on the next click.
 
 ## Design decisions
