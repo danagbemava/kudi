@@ -37,7 +37,12 @@ watch(
   <div class="overflow-hidden rounded-xl border border-line bg-white">
     <p class="sr-only" role="status" aria-live="polite">{{ status }}</p>
 
-    <div class="overflow-x-auto">
+    <!--
+      Below md the same records render as stacked cards. A seven-column ledger
+      squeezed into a phone pushes the amount and status off-screen behind a
+      horizontal scroll most people never find.
+    -->
+    <div class="hidden overflow-x-auto md:block">
       <table class="w-full text-left text-sm whitespace-nowrap" :aria-busy="loading">
         <caption class="sr-only">
           {{ label }}
@@ -72,6 +77,19 @@ watch(
           <slot />
         </tbody>
       </table>
+    </div>
+
+    <div class="md:hidden" :aria-busy="loading">
+      <ul v-if="loading" class="divide-y divide-line/60" aria-hidden="true">
+        <li v-for="row in 5" :key="row" class="space-y-2 px-4 py-3.5">
+          <div class="h-4 w-2/5 animate-pulse rounded bg-slate-200" />
+          <div class="h-3 w-3/5 animate-pulse rounded bg-slate-100" />
+        </li>
+      </ul>
+
+      <ul v-else-if="!error && !empty" class="divide-y divide-line/60">
+        <slot name="cards" />
+      </ul>
     </div>
 
     <div v-if="!loading && error" class="px-4 py-12 text-center">

@@ -52,7 +52,7 @@ const columns = ['Business', 'Contact', 'Institution', 'Wallet balance', 'Status
 <template>
   <div>
     <div class="mb-4 flex flex-wrap items-center gap-3">
-      <div class="relative min-w-0 flex-1 sm:max-w-xs">
+      <div class="relative basis-full sm:max-w-xs sm:flex-1 sm:basis-auto">
         <svg
           class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"
@@ -113,6 +113,31 @@ const columns = ['Business', 'Contact', 'Institution', 'Wallet balance', 'Status
         </td>
         <td class="px-4 py-3"><StatusBadge :status="merchant.status" /></td>
       </tr>
+
+      <template #cards>
+        <li v-for="merchant in merchants.items" :key="merchant.id" class="px-4 py-3">
+          <div class="flex items-start justify-between gap-3">
+            <RouterLink
+              :to="`/merchants/${merchant.id}`"
+              class="min-w-0 flex-1 text-sm font-medium text-ink hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-primary-600"
+            >
+              {{ merchant.business_name }}
+            </RouterLink>
+            <StatusBadge :status="merchant.status" />
+          </div>
+
+          <p class="mt-0.5 truncate text-xs text-slate-500">
+            {{ merchant.name }} · {{ merchant.email }}
+          </p>
+
+          <div class="mt-2 flex items-baseline justify-between gap-3">
+            <p class="font-display text-base font-semibold text-ink">
+              {{ formatMoney(merchant.wallet_balance ?? 0) }}
+            </p>
+            <p class="truncate text-xs text-slate-500">{{ merchant.institution?.name }}</p>
+          </div>
+        </li>
+      </template>
 
       <template #empty>
         <EmptyState

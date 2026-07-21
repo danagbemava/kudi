@@ -74,7 +74,11 @@ const columns = ['Reference', 'Batch', 'Merchant', 'Amount', 'Settled at']
               {{ dashboard.loading ? '…' : formatMoney(outstanding) }}
             </p>
             <p class="mt-0.5 text-sm text-slate-400">
-              moved to settlement records when the daily settlement runs
+              {{
+                outstanding === 0
+                  ? 'Nothing to settle — every wallet is already cleared.'
+                  : 'moved to settlement records when the daily settlement runs'
+              }}
             </p>
           </div>
           <BaseButton
@@ -141,6 +145,28 @@ const columns = ['Reference', 'Batch', 'Merchant', 'Amount', 'Settled at']
           {{ formatDateTime(settlement.settled_at) }}
         </td>
       </tr>
+
+      <template #cards>
+        <li v-for="settlement in settlements.items" :key="settlement.id" class="px-4 py-3">
+          <div class="flex items-start justify-between gap-3">
+            <RouterLink
+              v-if="settlement.merchant"
+              :to="`/merchants/${settlement.merchant.id}`"
+              class="min-w-0 flex-1 text-sm font-medium text-ink hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-primary-600"
+            >
+              {{ settlement.merchant.business_name }}
+            </RouterLink>
+            <p class="font-display text-base font-semibold text-ink">
+              {{ formatMoney(settlement.amount) }}
+            </p>
+          </div>
+
+          <p class="font-mono mt-0.5 truncate text-xs text-slate-500">
+            {{ settlement.reference }} · {{ settlement.batch_ref }}
+          </p>
+          <p class="mt-1 text-xs text-slate-500">{{ formatDateTime(settlement.settled_at) }}</p>
+        </li>
+      </template>
 
       <template #empty>
         <EmptyState

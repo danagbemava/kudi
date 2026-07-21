@@ -11,7 +11,7 @@ withDefaults(
 
 const styles: Record<string, string> = {
   primary:
-    'bg-primary-600 text-white hover:bg-primary-700 focus-visible:outline-primary-600 disabled:bg-primary-600/50',
+    'bg-primary-600 text-white hover:bg-primary-700 focus-visible:outline-primary-600 disabled:bg-primary-600/40 disabled:text-white/60',
   secondary:
     'bg-white text-ink border border-line hover:bg-slate-50 focus-visible:outline-primary-600 disabled:text-slate-400',
   danger:
