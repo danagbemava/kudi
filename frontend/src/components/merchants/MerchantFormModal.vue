@@ -7,6 +7,7 @@ import { useToast } from '../../composables/useToast'
 import { useMerchantsStore } from '../../stores/merchants'
 import BaseButton from '../ui/BaseButton.vue'
 import BaseInput from '../ui/BaseInput.vue'
+import BaseModal from '../ui/BaseModal.vue'
 import BaseSelect from '../ui/BaseSelect.vue'
 
 const props = defineProps<{ open: boolean }>()
