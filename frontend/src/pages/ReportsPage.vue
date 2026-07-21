@@ -129,7 +129,7 @@ function selectPreset(preset: { label: string; days: number | null }): void {
     </div>
 
     <template v-else>
-      <div class="grid gap-4 sm:grid-cols-3">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label="Platform fees earned"
           :value="formatMoney(summary?.platform_fees ?? 0)"
