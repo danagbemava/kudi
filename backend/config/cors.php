@@ -1,0 +1,29 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | CORS
+    |--------------------------------------------------------------------------
+    | The SPA authenticates with Sanctum session cookies, so the frontend
+    | origin must be allowed explicitly and credentials must be supported.
+    */
+
+    'paths' => ['api/*', 'login', 'logout', 'sanctum/csrf-cookie'],
+
+    'allowed_methods' => ['*'],
+
+    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:5173')],
+
+    'allowed_origins_patterns' => [],
+
+    'allowed_headers' => ['*'],
+
+    'exposed_headers' => [],
+
+    'max_age' => 0,
+
+    'supports_credentials' => true,
+
+];
