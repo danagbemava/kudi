@@ -22,49 +22,100 @@ const props = defineProps<{
  */
 const WEAVE = ['bg-gold', 'bg-forest', 'bg-clay', 'bg-ink-soft', 'bg-gold-deep']
 
+/**
+ * How many merchants get their own strip before the tail is grouped. Past
+ * this the strips are a few pixels wide — impossible to aim at, and each one
+ * would add a tab stop to the dashboard for no gain.
+ */
+const NAMED_LIMIT = 8
+
 const strips = computed(() => {
   if (props.total <= 0) return []
 
-  return props.merchants
+  const held = props.merchants
     .filter((m) => m.wallet_balance > 0)
     .sort((a, b) => b.wallet_balance - a.wallet_balance)
-    .map((m, index) => ({
-      id: m.id,
-      name: m.business_name,
-      amount: m.wallet_balance,
-      share: (m.wallet_balance / props.total) * 100,
-      colour: WEAVE[index % WEAVE.length]!,
-    }))
+
+  const named = held.slice(0, NAMED_LIMIT)
+  const rest = held.slice(NAMED_LIMIT)
+
+  const entries = named.map((m) => ({
+    key: `m${m.id}`,
+    to: `/merchants/${m.id}`,
+    name: m.business_name,
+    amount: m.wallet_balance,
+  }))
+
+  if (rest.length > 0) {
+    entries.push({
+      key: 'rest',
+      to: '/merchants',
+      name: `${rest.length} other merchants`,
+      amount: rest.reduce((sum, m) => sum + m.wallet_balance, 0),
+    })
+  }
+
+  return entries.map((entry, index) => ({
+    ...entry,
+    share: (entry.amount / props.total) * 100,
+    colour: WEAVE[index % WEAVE.length]!,
+    // The card clips its overflow, so tooltips on the end strips anchor to
+    // that edge rather than centring, where they would be cut off.
+    anchor:
+      index === 0
+        ? 'sm:right-auto sm:left-0 sm:translate-x-0'
+        : index === entries.length - 1
+          ? 'sm:right-0 sm:left-auto sm:translate-x-0'
+          : 'sm:right-auto sm:left-1/2 sm:-translate-x-1/2',
+  }))
 })
 
 const leaders = computed(() => strips.value.slice(0, 3))
+
+function label(strip: { name: string; amount: number; share: number }): string {
+  return `${strip.name}, ${formatMoney(strip.amount)}, ${Math.round(strip.share)}% of the float`
+}
 </script>
 
 <template>
   <div v-if="strips.length > 0" class="mt-5">
-    <div
-      class="flex h-8 gap-px overflow-hidden rounded-md"
-      role="img"
-      :aria-label="`Unsettled float across ${strips.length} merchants. Largest: ${leaders
-        .map((s) => `${s.name} ${Math.round(s.share)} percent`)
-        .join(', ')}.`"
-    >
-      <div
+    <div class="relative flex h-8 gap-px overflow-visible rounded-md">
+      <RouterLink
         v-for="strip in strips"
-        :key="strip.id"
-        :class="[strip.colour, 'group relative transition-opacity hover:opacity-80']"
+        :key="strip.key"
+        :to="strip.to"
+        :aria-label="label(strip)"
+        :class="[
+          strip.colour,
+          'group transition-opacity hover:opacity-85 sm:relative',
+          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white',
+          'first:rounded-l-md last:rounded-r-md',
+        ]"
         :style="{ width: `${strip.share}%` }"
       >
+        <!-- Shown on focus as well as hover, so the band is inspectable
+             without a pointer. -->
         <span
-          class="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 hidden -translate-x-1/2 rounded-md bg-ink px-2 py-1 text-xs whitespace-nowrap text-white group-hover:block"
+          :class="[
+            'pointer-events-none absolute right-0 bottom-full left-0 z-10 mb-2 hidden',
+            'rounded-md bg-ink px-2.5 py-1.5 text-center text-xs text-white shadow-lg ring-1 ring-white/15',
+            'sm:w-max sm:text-left sm:whitespace-nowrap',
+            'group-hover:block group-focus-visible:block',
+            strip.anchor,
+          ]"
+          role="tooltip"
         >
-          {{ strip.name }} · {{ formatMoney(strip.amount) }}
+          <span class="font-medium">{{ strip.name }}</span>
+          <span class="text-zinc-300"> · {{ formatMoney(strip.amount) }}</span>
+          <span class="text-zinc-400"> · {{ Math.round(strip.share) }}%</span>
         </span>
-      </div>
+      </RouterLink>
     </div>
 
+    <!-- The named leaders double as the touch-friendly reading of the band,
+         where there is no hover and the strips are only a few pixels wide. -->
     <p class="mt-2 text-xs text-zinc-300">
-      <template v-for="(strip, index) in leaders" :key="strip.id">
+      <template v-for="(strip, index) in leaders" :key="strip.key">
         <span v-if="index > 0" aria-hidden="true"> · </span>
         {{ strip.name }} {{ Math.round(strip.share) }}%
       </template>
