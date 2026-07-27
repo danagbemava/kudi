@@ -24,6 +24,12 @@ function mountButton(walletBalance: number, unsettledCount = 3) {
       business_name: `Merchant ${i + 1}`,
       wallet_balance: Math.floor(walletBalance / Math.max(unsettledCount, 1)),
     })),
+    // Every holder is named in this fixture, so there is no tail to describe.
+    unsettled_meta: {
+      holder_count: unsettledCount,
+      remainder_count: 0,
+      remainder_amount: 0,
+    },
   }
 
   return mount(RunSettlementButton, { global: { stubs: { Teleport: true } } })
