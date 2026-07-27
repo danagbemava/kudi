@@ -1,4 +1,22 @@
+# Agent and editor tooling. Local to a machine, not part of the project.
+.claude/
 .superpowers/
+.cursor/
+.aider*
+.vscode/
+.idea/
+*.swp
+
+# OS noise
 .DS_Store
+Thumbs.db
+
 # Scratch output from browser automation (screenshots, page snapshots).
 .playwright-mcp/
+
+# Stray captures at the repo root. Screenshots that belong to the project live
+# in docs/screenshots and are anchored below this rule, so they still commit.
+/*.png
+/*.jpg
+/*.jpeg
+/*.gif
