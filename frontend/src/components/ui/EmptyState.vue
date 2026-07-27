@@ -25,17 +25,17 @@ withDefaults(
 <template>
   <div class="mx-auto max-w-sm text-center">
     <div
-      class="mx-auto flex size-11 items-center justify-center rounded-full bg-forest-wash text-forest"
+      class="mx-auto flex size-11 items-center justify-center rounded-full bg-canvas text-field"
       aria-hidden="true"
     >
       <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path stroke-linecap="round" stroke-linejoin="round" :d="ICONS[icon]" />
       </svg>
     </div>
-    <component :is="`h${level}`" class="mt-3 font-display text-sm font-semibold text-ink">
+    <component :is="`h${level}`" class="font-display mt-3 text-sm font-semibold text-ink">
       {{ title }}
     </component>
-    <p class="mt-1 text-sm text-zinc-500">{{ message }}</p>
+    <p class="mt-1 text-sm text-muted">{{ message }}</p>
     <div v-if="$slots.action" class="mt-4">
       <slot name="action" />
     </div>

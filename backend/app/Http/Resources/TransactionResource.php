@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\TransactionStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,6 +19,11 @@ class TransactionResource extends JsonResource
             'net_amount' => $this->net_amount,
             'status' => $this->status,
             'created_at' => $this->created_at,
+            // When the gateway resolved it. A transaction is only ever written
+            // twice — created pending, then settled into a final status — so
+            // updated_at is that moment. Null while still pending, rather than
+            // reporting the creation time as though it had been decided.
+            'processed_at' => $this->status === TransactionStatus::Pending ? null : $this->updated_at,
         ];
     }
 }

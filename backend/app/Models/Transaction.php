@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TransactionStatus;
+use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -56,14 +57,23 @@ class Transaction extends Model
             : $query->whereRaw('LOWER(reference) LIKE ?', ['%'.mb_strtolower($term).'%']);
     }
 
+    /**
+     * Both ends inclusive by day. Expressed as a half-open range on the raw
+     * column rather than whereDate(), which wraps created_at in a function and
+     * forfeits the index the migration puts on it.
+     */
     public function scopeCreatedBetween(
         Builder $query,
         ?DateTimeInterface $from,
         ?DateTimeInterface $to,
     ): Builder {
         return $query
-            ->when($from, fn (Builder $q) => $q->whereDate('created_at', '>=', $from))
-            ->when($to, fn (Builder $q) => $q->whereDate('created_at', '<=', $to));
+            ->when($from, fn (Builder $q) => $q->where(
+                'created_at', '>=', CarbonImmutable::instance($from)->startOfDay()
+            ))
+            ->when($to, fn (Builder $q) => $q->where(
+                'created_at', '<', CarbonImmutable::instance($to)->startOfDay()->addDay()
+            ));
     }
 
     public function isPending(): bool

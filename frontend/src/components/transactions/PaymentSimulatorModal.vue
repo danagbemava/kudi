@@ -5,7 +5,7 @@ import { ApiValidationError, toApiError } from '../../api/client'
 import type { Merchant, Transaction } from '../../api/types'
 import { useToast } from '../../composables/useToast'
 import { useTransactionsStore } from '../../stores/transactions'
-import { feeFor, formatMoney, parseAmount } from '../../utils/money'
+import { feeFor, feePercent, formatMoney, parseAmount } from '../../utils/money'
 import BaseButton from '../ui/BaseButton.vue'
 import BaseInput from '../ui/BaseInput.vue'
 import BaseModal from '../ui/BaseModal.vue'
@@ -160,18 +160,18 @@ async function submit(): Promise<void> {
       class="text-center outline-none"
     >
       <StatusBadge :status="result.status" class="mx-auto" />
-      <p class="mt-3 font-display text-2xl font-semibold text-ink">
+      <p class="font-display mt-3 text-2xl font-semibold text-ink">
         {{ formatMoney(result.gross_amount) }}
       </p>
-      <p class="mt-1 font-mono text-xs text-zinc-500">{{ result.reference }}</p>
+      <p class="mt-1 font-mono text-xs text-muted">{{ result.reference }}</p>
 
-      <dl class="mt-4 space-y-1.5 rounded-lg bg-zinc-50 p-4 text-sm">
+      <dl class="mt-4 space-y-1.5 rounded-lg bg-canvas p-4 text-sm">
         <div class="flex justify-between">
-          <dt class="text-zinc-500">Gross amount</dt>
+          <dt class="text-muted">Gross amount</dt>
           <dd class="font-medium text-ink">{{ formatMoney(result.gross_amount) }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-zinc-500">Processing fee (1.5%)</dt>
+          <dt class="text-muted">Processing fee ({{ feePercent() }}%)</dt>
           <dd class="font-medium text-ink">− {{ formatMoney(result.fee_amount) }}</dd>
         </div>
         <div class="flex justify-between border-t border-line pt-1.5">
@@ -180,7 +180,7 @@ async function submit(): Promise<void> {
           </dt>
           <dd
             class="font-display font-semibold"
-            :class="result.status === 'successful' ? 'text-forest' : 'text-zinc-500 line-through'"
+            :class="result.status === 'successful' ? 'text-good' : 'text-muted line-through'"
           >
             {{ formatMoney(result.net_amount) }}
           </dd>
@@ -224,31 +224,28 @@ async function submit(): Promise<void> {
       <p class="sr-only" role="status">{{ feeAnnouncement }}</p>
 
       <!-- Live fee preview -->
-      <dl class="space-y-1.5 rounded-lg bg-zinc-50 p-4 text-sm">
+      <dl class="space-y-1.5 rounded-lg bg-canvas p-4 text-sm">
         <div class="flex justify-between">
-          <dt class="text-zinc-500">Gross amount</dt>
+          <dt class="text-muted">Gross amount</dt>
           <dd class="font-medium text-ink">
             {{ amountMinor !== null ? formatMoney(amountMinor) : '—' }}
           </dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-zinc-500">Processing fee (1.5%)</dt>
+          <dt class="text-muted">Processing fee ({{ feePercent() }}%)</dt>
           <dd class="font-medium text-ink">{{ fee !== null ? `− ${formatMoney(fee)}` : '—' }}</dd>
         </div>
         <div class="flex justify-between border-t border-line pt-1.5">
           <dt class="font-medium text-ink">Net wallet credit</dt>
-          <dd class="font-display font-semibold text-forest">
+          <dd class="font-display font-semibold text-good">
             {{ net !== null ? formatMoney(net) : '—' }}
           </dd>
         </div>
       </dl>
 
       <div class="flex items-center justify-end gap-2 pt-1">
-        <p
-          v-if="phase === 'submitting'"
-          class="mr-auto flex items-center gap-2 text-sm text-zinc-500"
-        >
-          <span class="size-1.5 animate-pulse rounded-full bg-gold" aria-hidden="true" />
+        <p v-if="phase === 'submitting'" class="mr-auto flex items-center gap-2 text-sm text-muted">
+          <span class="size-1.5 animate-pulse rounded-full bg-warn" aria-hidden="true" />
           Waiting for gateway…
         </p>
         <BaseButton variant="secondary" :disabled="phase === 'submitting'" @click="emit('close')">

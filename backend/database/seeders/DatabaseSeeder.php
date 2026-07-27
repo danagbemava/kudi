@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Services\SettlementService;
 use App\Support\Money;
+use Database\Factories\MerchantFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -26,12 +27,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Kudi Admin',
-            'email' => 'admin@kudi.test',
-        ]);
+        // Guarded rather than unconditional: `php artisan migrate --seed` is
+        // the documented way to start this app, and running it a second time on
+        // an existing database used to die on the unique index for this email.
+        // The factory still owns the password, so it stays in one place.
+        if (! User::query()->where('email', 'admin@kudi.test')->exists()) {
+            User::factory()->create([
+                'name' => 'Kudi Admin',
+                'email' => 'admin@kudi.test',
+            ]);
+        }
 
         $this->call(InstitutionSeeder::class);
+
+        // Everything below is a chronological replay of 30 days. Running it
+        // again would append a *second* 30 days rather than reproduce the
+        // first, so this seeder is idempotent by declining to duplicate rather
+        // than by merging. `migrate:fresh --seed` rebuilds from scratch.
+        if (Merchant::query()->exists()) {
+            $this->command?->info(
+                'Merchant activity is already seeded — skipping. Run `php artisan migrate:fresh --seed` to rebuild it.'
+            );
+
+            return;
+        }
 
         $merchants = $this->seedMerchants();
 
@@ -81,8 +100,8 @@ class DatabaseSeeder extends Seeder
                 'name' => $name,
                 'email' => Str::slug($name, '.').'@'.Str::slug($business, '').'.gh',
                 'business_name' => $business,
-                'institution_id' => $institutions->random()->id,
-                'account_number' => fake()->numerify('##########'),
+                'institution_id' => $institution = $institutions->random()->id,
+                'account_number' => MerchantFactory::accountNumberFor($institution),
                 // A couple of deactivated merchants make the status UI honest.
                 'status' => $index >= 10 ? MerchantStatus::Inactive : MerchantStatus::Active,
             ]);

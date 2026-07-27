@@ -52,6 +52,22 @@ const selectedInstitution = computed(() =>
   merchants.institutions.find((i) => i.id === form.value.institution_id),
 )
 
+/**
+ * The rule the server enforces, stated before it is broken rather than after.
+ * Mirrored from App\Support\AccountNumber — the server stays the authority,
+ * this just stops people finding out by being rejected.
+ */
+const accountHint = computed(() => {
+  if (!selectedInstitution.value) return 'Choose an institution first.'
+  return selectedInstitution.value.type === 'mobile_money'
+    ? 'The 10-digit mobile money number, starting 0. For example 024 123 4567.'
+    : 'Digits only, between 8 and 20 of them.'
+})
+
+const accountPlaceholder = computed(() =>
+  selectedInstitution.value?.type === 'mobile_money' ? '024 123 4567' : '1033662013',
+)
+
 const accountLabel = computed(() =>
   selectedInstitution.value?.type === 'mobile_money' ? 'Mobile money number' : 'Account number',
 )
@@ -126,10 +142,12 @@ async function submit(): Promise<void> {
       <BaseInput
         v-model="form.account_number"
         :label="accountLabel"
-        placeholder="0244123456"
+        :placeholder="accountPlaceholder"
+        inputmode="numeric"
+        autocomplete="off"
         required
         :error="errors.account_number"
-        hint="Where settlements for this merchant are paid out."
+        :hint="accountHint"
       />
 
       <div class="flex justify-end gap-2 pt-1">

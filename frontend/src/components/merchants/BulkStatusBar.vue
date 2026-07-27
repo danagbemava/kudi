@@ -42,7 +42,7 @@ async function apply(): Promise<void> {
 <template>
   <div
     v-if="selected.length > 0"
-    class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-forest/25 bg-forest-wash px-4 py-3"
+    class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-good/25 bg-good-wash px-4 py-3"
     role="status"
   >
     <p class="text-sm font-medium text-ink">

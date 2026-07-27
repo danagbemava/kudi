@@ -1,2 +1,4 @@
 .superpowers/
 .DS_Store
+# Scratch output from browser automation (screenshots, page snapshots).
+.playwright-mcp/

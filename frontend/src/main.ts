@@ -2,6 +2,7 @@ import './style.css'
 
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
+import { syncServerConfig } from './api/bootstrap'
 import { onSessionExpired } from './api/client'
 import App from './App.vue'
 import router from './router'
@@ -30,5 +31,9 @@ onSessionExpired(() => {
     },
   })
 })
+
+// Picks up the server's fee rate if a session already exists; the auth store
+// asks again once one is established.
+syncServerConfig()
 
 app.mount('#app')

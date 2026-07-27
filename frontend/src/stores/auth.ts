@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { api } from '../api'
+import { syncServerConfig } from '../api/bootstrap'
 import { isUnauthorized, notifySessionExpired } from '../api/client'
 import type { User } from '../api/types'
 
@@ -25,6 +26,10 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(email: string, password: string): Promise<void> {
     user.value = await api.login(email, password)
     checked.value = true
+
+    // Server-owned constants live behind auth, so this is the first moment
+    // they can be read.
+    syncServerConfig()
   }
 
   async function logout(): Promise<void> {

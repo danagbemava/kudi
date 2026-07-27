@@ -68,17 +68,41 @@ describe('unsettledFloat', function () {
 
         $float = $this->reporting->unsettledFloat();
 
-        expect($float)->toHaveCount(2)
-            ->and($float[0]['business_name'])->toBe('Big Float')
-            ->and($float[0]['wallet_balance'])->toBe(500_000)
-            ->and($float[1]['business_name'])->toBe('Small Float');
+        expect($float['holders'])->toHaveCount(2)
+            ->and($float['holders'][0]['business_name'])->toBe('Big Float')
+            ->and($float['holders'][0]['wallet_balance'])->toBe(500_000)
+            ->and($float['holders'][1]['business_name'])->toBe('Small Float')
+            ->and($float['holder_count'])->toBe(2)
+            ->and($float['remainder_count'])->toBe(0)
+            ->and($float['remainder_amount'])->toBe(0);
     });
 
-    it('caps how many merchants it returns', function () {
+    it('caps how many merchants it names', function () {
         Merchant::factory()->count(5)->create()
             ->each(fn ($m) => $m->wallet->update(['balance' => 1_000]));
 
-        expect($this->reporting->unsettledFloat(limit: 3))->toHaveCount(3);
+        expect($this->reporting->unsettledFloat(limit: 3)['holders'])->toHaveCount(3);
+    });
+
+    /**
+     * The band divides each strip by the whole float. If the tail beyond the
+     * cap were simply dropped, the strips would stop summing to 100% and the
+     * dashboard would under-report how many merchants are owed money.
+     */
+    it('accounts for the holders it did not name', function () {
+        Merchant::factory()->count(5)->create()
+            ->each(fn ($m) => $m->wallet->update(['balance' => 1_000]));
+
+        $float = $this->reporting->unsettledFloat(limit: 3);
+
+        expect($float['holder_count'])->toBe(5)
+            ->and($float['remainder_count'])->toBe(2)
+            ->and($float['remainder_amount'])->toBe(2_000);
+
+        $accounted = array_sum(array_column($float['holders'], 'wallet_balance'))
+            + $float['remainder_amount'];
+
+        expect($accounted)->toBe(5_000);
     });
 });
 

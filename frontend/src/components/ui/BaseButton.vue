@@ -9,15 +9,21 @@ withDefaults(
   { variant: 'primary', type: 'button', loading: false, disabled: false },
 )
 
+// Disabled states go grey rather than fading the live colour. A tinted-down
+// primary landed at 1.87:1 — WCAG exempts inactive controls, but "Run
+// settlement" is disabled precisely when the operator needs to read why, so it
+// stays legible. Grey fill plus not-allowed carries the state instead.
 const styles: Record<string, string> = {
+  // Violet is near-black, so the primary button carries white text and lightens
+  // on hover rather than darkening.
   primary:
-    'bg-gold text-ink hover:bg-gold-deep focus-visible:outline-forest disabled:bg-gold/40 disabled:text-ink/45',
+    'bg-violet text-white hover:bg-violet/85 focus-visible:outline-accent disabled:bg-line disabled:text-ink-soft',
   secondary:
-    'bg-white text-ink border border-line hover:bg-zinc-50 focus-visible:outline-forest disabled:text-zinc-400',
+    'bg-surface text-ink border border-line hover:bg-canvas focus-visible:outline-accent disabled:text-muted',
   danger:
-    'bg-white text-clay border border-clay/25 hover:bg-clay-wash focus-visible:outline-clay disabled:text-clay/40',
+    'bg-surface text-bad border border-bad/25 hover:bg-bad-wash focus-visible:outline-bad disabled:border-line disabled:text-muted',
   ghost:
-    'text-zinc-600 hover:bg-zinc-100 hover:text-ink focus-visible:outline-forest disabled:text-zinc-300',
+    'text-ink-soft hover:bg-canvas hover:text-ink focus-visible:outline-accent disabled:text-muted',
 }
 </script>
 

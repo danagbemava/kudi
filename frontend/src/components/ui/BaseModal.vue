@@ -105,7 +105,7 @@ function onKeydown(event: KeyboardEvent): void {
           :aria-describedby="bodyId"
           tabindex="-1"
           :class="[
-            'w-full rounded-2xl bg-white shadow-xl outline-none',
+            'w-full rounded-2xl bg-surface shadow-xl outline-none',
             wide ? 'max-w-2xl' : 'max-w-md',
           ]"
         >
@@ -114,7 +114,7 @@ function onKeydown(event: KeyboardEvent): void {
             <button
               type="button"
               data-modal-close
-              class="rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-forest"
+              class="rounded-md p-1 text-muted transition-colors hover:bg-canvas hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
               aria-label="Close dialog"
               @click="emit('close')"
             >

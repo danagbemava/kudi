@@ -103,4 +103,54 @@ describe('SettlementBand', () => {
       expect(rendered.at(-1)!.attributes('aria-label')).not.toContain('other merchants')
     })
   })
+
+  /**
+   * The server caps the holder list it sends. The band divides each strip by
+   * the whole float, so holders left out of that list still have to be
+   * accounted for — otherwise the strips stop summing to 100% and the band
+   * under-fills, silently, only once there are enough merchants to hit the cap.
+   */
+  describe('holders the server did not send', () => {
+    function mountWithRemainder(count: number, amount: number) {
+      const named = holders(4, 1_000) // GHS 40 named
+      return mount(SettlementBand, {
+        props: {
+          merchants: named,
+          total: named.reduce((sum, m) => sum + m.wallet_balance, 0) + amount,
+          remainderCount: count,
+          remainderAmount: amount,
+        },
+        global: { stubs: { RouterLink: RouterLinkStub } },
+      })
+    }
+
+    it('folds them into the tail band', () => {
+      const wrapper = mountWithRemainder(36, 6_000)
+      const rendered = strips(wrapper)
+
+      expect(rendered).toHaveLength(5) // 4 named + 1 tail
+      expect(rendered[4]!.attributes('aria-label')).toBe(
+        `36 other merchants, ${formatMoney(6_000)}, 60% of the float`,
+      )
+    })
+
+    it('leaves the strips summing to the whole float', () => {
+      const wrapper = mountWithRemainder(36, 6_000)
+      const shares = strips(wrapper).map((strip) =>
+        Number(/([\d.]+)%/.exec(strip.attributes('style') ?? '')?.[1] ?? 0),
+      )
+
+      expect(shares.reduce((sum, share) => sum + share, 0)).toBeCloseTo(100, 5)
+    })
+
+    it('says "merchant" when exactly one is unnamed', () => {
+      const wrapper = mountWithRemainder(1, 1_000)
+
+      expect(strips(wrapper).at(-1)!.attributes('aria-label')).toContain('1 other merchant,')
+    })
+
+    it('adds no tail when the server sent everyone', () => {
+      expect(strips(mountWithRemainder(0, 0))).toHaveLength(4)
+    })
+  })
 })

@@ -63,6 +63,26 @@ http.interceptors.response.use(
   },
 )
 
+/**
+ * Every mutating request needs the CSRF cookie, and the cost of asking for one
+ * that already exists is a cached no-op. Doing this in the interceptor rather
+ * than per-call is what stops the list drifting: `setMerchantStatus`,
+ * `processTransaction` and `logout` were each missing their own `ensureCsrf()`
+ * and only worked because the cookie usually outlived the module flag.
+ */
+const MUTATING = ['post', 'put', 'patch', 'delete']
+
+http.interceptors.request.use(async (config) => {
+  const method = (config.method ?? 'get').toLowerCase()
+
+  // The CSRF endpoint itself must not recurse into this.
+  if (MUTATING.includes(method) && !config.url?.endsWith('/sanctum/csrf-cookie')) {
+    await ensureCsrf()
+  }
+
+  return config
+})
+
 export class ApiValidationError extends Error {
   fields: Record<string, string[]>
 

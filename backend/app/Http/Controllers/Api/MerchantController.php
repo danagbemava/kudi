@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\TransactionStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BulkMerchantStatusRequest;
+use App\Http\Requests\MerchantIndexRequest;
 use App\Http\Requests\StoreMerchantRequest;
 use App\Http\Resources\MerchantResource;
 use App\Http\Resources\SettlementResource;
@@ -17,14 +18,23 @@ use Illuminate\Validation\Rule;
 
 class MerchantController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(MerchantIndexRequest $request): AnonymousResourceCollection
     {
+        [$column, $direction] = $this->sort($request, MerchantIndexRequest::SORTABLE, 'merchants.created_at');
+
         $merchants = Merchant::query()
             ->with(['institution', 'wallet'])
+            // Wallet balance lives on another table, so ordering by it needs
+            // the join. Left, not inner: a merchant whose wallet row is somehow
+            // missing should still be listed rather than vanish from the table.
+            ->leftJoin('wallets', 'wallets.merchant_id', '=', 'merchants.id')
+            ->select('merchants.*')
             ->search($request->string('search'))
             ->withStatus($request->string('status'))
-            ->latest()
-            ->paginate($this->perPage($request));
+            ->orderBy($column, $direction)
+            ->orderBy('merchants.id', 'desc')
+            ->paginate($this->perPage($request))
+            ->withQueryString();
 
         return MerchantResource::collection($merchants);
     }

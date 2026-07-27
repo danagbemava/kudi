@@ -1,5 +1,6 @@
-import { ensureCsrf, http } from './client'
+import { http } from './client'
 import type {
+  AppConfig,
   DashboardData,
   Institution,
   Merchant,
@@ -8,12 +9,25 @@ import type {
   Paginated,
   ReportSummary,
   Settlement,
+  SettlementBatch,
   SettlementRunResult,
   Transaction,
   User,
 } from './types'
 
-export interface MerchantFilters {
+export type SortDirection = 'asc' | 'desc'
+
+/** Columns each listing may be ordered by. Mirrors the server's whitelist. */
+export type MerchantSort = 'registered' | 'business' | 'contact' | 'status' | 'balance'
+export type TransactionSort = 'date' | 'reference' | 'gross' | 'fee' | 'net' | 'status'
+export type SettlementSort = 'date' | 'reference' | 'batch' | 'amount'
+
+export interface SortFilters<TSort extends string> {
+  sort?: TSort
+  direction?: SortDirection
+}
+
+export interface MerchantFilters extends SortFilters<MerchantSort> {
   search?: string
   status?: MerchantStatus | ''
   page?: number
@@ -21,7 +35,7 @@ export interface MerchantFilters {
   per_page?: number
 }
 
-export interface TransactionFilters {
+export interface TransactionFilters extends SortFilters<TransactionSort> {
   search?: string
   status?: string
   merchant_id?: number
@@ -30,10 +44,13 @@ export interface TransactionFilters {
   page?: number
 }
 
-export interface DateRangeFilters {
+export interface DateRangeFilters extends SortFilters<SettlementSort> {
   from?: string
   to?: string
   page?: number
+  per_page?: number
+  /** Narrows to a single settlement run. */
+  batch?: string
 }
 
 function query(params: object): Record<string, unknown> {
@@ -44,7 +61,6 @@ function query(params: object): Record<string, unknown> {
 
 export const api = {
   async login(email: string, password: string): Promise<User> {
-    await ensureCsrf()
     const { data } = await http.post<{ data: User }>('/api/login', { email, password })
     return data.data
   },
@@ -87,7 +103,6 @@ export const api = {
     institution_id: number | null
     account_number: string
   }): Promise<Merchant> {
-    await ensureCsrf()
     const { data } = await http.post<{ data: Merchant }>('/api/merchants', payload)
     return data.data
   },
@@ -97,7 +112,6 @@ export const api = {
     ids: number[],
     status: MerchantStatus,
   ): Promise<{ updated: number; status: MerchantStatus }> {
-    await ensureCsrf()
     const { data } = await http.patch<{ data: { updated: number; status: MerchantStatus } }>(
       '/api/merchants/status',
       { ids, status },
@@ -122,8 +136,15 @@ export const api = {
     amount: number
     reference: string
   }): Promise<Transaction> {
-    await ensureCsrf()
     const { data } = await http.post<{ data: Transaction }>('/api/payments', payload)
+    return data.data
+  },
+
+  /** One transaction by reference — what a shared link carries. */
+  async transaction(reference: string): Promise<Transaction> {
+    const { data } = await http.get<{ data: Transaction }>(
+      `/api/transactions/${encodeURIComponent(reference)}`,
+    )
     return data.data
   },
 
@@ -139,8 +160,15 @@ export const api = {
     return data
   },
 
+  /** Settlement history as runs. Each row is one sweep, with its own total. */
+  async settlementBatches(filters: DateRangeFilters = {}): Promise<Paginated<SettlementBatch>> {
+    const { data } = await http.get<Paginated<SettlementBatch>>('/api/settlements/batches', {
+      params: query(filters),
+    })
+    return data
+  },
+
   async runSettlement(): Promise<SettlementRunResult> {
-    await ensureCsrf()
     const { data } = await http.post<{ data: SettlementRunResult }>('/api/settlements/run')
     return data.data
   },
@@ -151,4 +179,28 @@ export const api = {
     })
     return data.data
   },
+
+  /**
+   * Server-owned constants. Cached for the life of the page: the fee rate is
+   * deployment configuration, not data, so re-fetching it per modal open would
+   * be a request that can never return anything new.
+   */
+  async config(): Promise<AppConfig> {
+    configPromise ??= http
+      .get<{ data: AppConfig }>('/api/config')
+      .then((response) => response.data.data)
+      .catch((error: unknown) => {
+        configPromise = null // a failed fetch must not be cached as the answer
+        throw error
+      })
+
+    return configPromise
+  },
+}
+
+let configPromise: Promise<AppConfig> | null = null
+
+/** Drops the cached config. Exists for tests, which must not share state. */
+export function resetConfigCache(): void {
+  configPromise = null
 }

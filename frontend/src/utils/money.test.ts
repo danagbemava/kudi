@@ -1,5 +1,7 @@
-import { describe, expect, it } from 'vitest'
-import { feeFor, formatMoney, parseAmount } from './money'
+import { afterEach, describe, expect, it } from 'vitest'
+import { feeFor, feePercent, formatMoney, parseAmount, setFeeBasisPoints } from './money'
+
+afterEach(() => setFeeBasisPoints(150))
 
 describe('parseAmount', () => {
   it('parses whole cedis into pesewas', () => {
@@ -29,6 +31,36 @@ describe('feeFor', () => {
     expect(feeFor(100)).toBe(2) // 1.5 pesewas rounds up
     expect(feeFor(99)).toBe(1) // 1.485 rounds down
     expect(feeFor(0)).toBe(0)
+  })
+
+  /**
+   * The rate is deployment configuration (KUDI_FEE_BASIS_POINTS) and the
+   * backend reads it from config. A second hardcoded copy here meant the
+   * simulator's live preview and the actual charge agreed only at the default.
+   */
+  it('follows the rate the server reports', () => {
+    setFeeBasisPoints(275)
+
+    expect(feeFor(10_000)).toBe(275)
+    expect(feePercent()).toBe(2.75)
+  })
+
+  it('keeps half-up rounding at any rate', () => {
+    setFeeBasisPoints(333)
+
+    // 10_000 * 333 = 3_330_000; +5_000 = 3_335_000; / 10_000 = 333.5 → 333
+    expect(feeFor(10_000)).toBe(333)
+    // 101 * 333 = 33_633; +5_000 = 38_633; / 10_000 = 3.86 → 3
+    expect(feeFor(101)).toBe(3)
+  })
+
+  it('ignores a nonsensical rate rather than charging it', () => {
+    setFeeBasisPoints(150)
+    setFeeBasisPoints(Number.NaN)
+    expect(feePercent()).toBe(1.5)
+
+    setFeeBasisPoints(-10)
+    expect(feePercent()).toBe(1.5)
   })
 })
 

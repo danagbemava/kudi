@@ -24,12 +24,29 @@ const merchant = computed(() => merchants.detail)
 const confirmOpen = ref(false)
 const toggling = ref(false)
 
+/** Reset per merchant, so navigating between them never carries a reveal over. */
+const accountVisible = ref(false)
+
+/**
+ * Last four digits only. Enough to check a payout against a statement, which
+ * is what the number is used for here, without putting the whole thing on a
+ * screen that sits open all day.
+ */
+function maskAccount(account: string): string {
+  if (account.length <= 4) return '•'.repeat(account.length)
+
+  return '•'.repeat(account.length - 4) + account.slice(-4)
+}
+
 function load(): void {
   merchants.fetchDetail(merchantId.value)
 }
 
 onMounted(load)
-watch(merchantId, load)
+watch(merchantId, () => {
+  accountVisible.value = false
+  load()
+})
 watch(
   () => merchant.value?.business_name,
   (name) => pageTitle.set(name ?? null),
@@ -60,10 +77,10 @@ async function toggleStatus(): Promise<void> {
 
 <template>
   <div>
-    <nav class="mb-4 text-sm text-zinc-500" aria-label="Breadcrumb">
+    <nav class="mb-4 text-sm text-muted" aria-label="Breadcrumb">
       <RouterLink
         to="/merchants"
-        class="hover:text-ink focus-visible:outline-2 focus-visible:outline-forest"
+        class="hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
       >
         Merchants
       </RouterLink>
@@ -73,19 +90,16 @@ async function toggleStatus(): Promise<void> {
 
     <!-- Loading skeleton -->
     <div v-if="merchants.detailLoading" class="space-y-4">
-      <div class="h-20 animate-pulse rounded-xl bg-zinc-200" />
+      <div class="h-20 animate-pulse rounded-xl bg-line" />
       <div class="grid gap-4 lg:grid-cols-4">
-        <div v-for="i in 4" :key="i" class="h-28 animate-pulse rounded-xl bg-zinc-100" />
+        <div v-for="i in 4" :key="i" class="h-28 animate-pulse rounded-xl bg-canvas" />
       </div>
-      <div class="h-64 animate-pulse rounded-xl bg-zinc-100" />
+      <div class="h-64 animate-pulse rounded-xl bg-canvas" />
     </div>
 
     <!-- Error -->
-    <div
-      v-else-if="merchants.detailError"
-      class="rounded-xl border border-line bg-white px-6 py-16 text-center"
-    >
-      <p class="text-sm text-zinc-600" role="alert">{{ merchants.detailError }}</p>
+    <div v-else-if="merchants.detailError" class="panel px-6 py-16 text-center">
+      <p class="text-sm text-ink-soft" role="alert">{{ merchants.detailError }}</p>
       <BaseButton variant="secondary" class="mt-4" @click="load">Retry</BaseButton>
     </div>
 
@@ -99,20 +113,40 @@ async function toggleStatus(): Promise<void> {
             </h2>
             <StatusBadge :status="merchant.status" />
           </div>
-          <p class="mt-1 text-sm text-zinc-500">{{ merchant.name }} · {{ merchant.email }}</p>
-          <p class="mt-0.5 text-sm text-zinc-500">
+          <p class="mt-1 text-sm text-muted">{{ merchant.name }} · {{ merchant.email }}</p>
+          <p class="mt-0.5 text-sm text-muted">
             {{ merchant.institution?.name }} ·
-            <span class="font-mono">{{ merchant.account_number }}</span>
-            · registered {{ formatDate(merchant.created_at) }}
+            <!--
+              Masked by default. This is the single most sensitive field in the
+              product and the page it lives on is one an operator leaves open
+              all day, in an office, on a screen other people walk past. It is
+              needed rarely — to check a payout against a bank — so it is one
+              deliberate click away rather than always on display.
+            -->
+            <span class="font-mono">{{
+              accountVisible ? merchant.account_number : maskAccount(merchant.account_number)
+            }}</span>
+            <button
+              type="button"
+              class="ml-1.5 font-medium text-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              :aria-pressed="accountVisible"
+              :aria-label="
+                accountVisible ? 'Hide the account number' : 'Show the full account number'
+              "
+              @click="accountVisible = !accountVisible"
+            >
+              {{ accountVisible ? 'Hide' : 'Show' }}
+            </button>
+            <span class="ml-1.5">· registered {{ formatDate(merchant.created_at) }}</span>
           </p>
         </div>
         <!-- Kept apart from the identity block: a control that stops a
              merchant taking payments should not sit flush against their name
              as if it were part of the heading. -->
         <div
-          class="flex items-center gap-3 rounded-lg border border-line bg-white px-3 py-2 sm:px-4"
+          class="flex items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2 sm:px-4"
         >
-          <p class="hidden text-xs text-zinc-500 sm:block">
+          <p class="hidden text-xs text-muted sm:block">
             {{ deactivating ? 'Accepting payments' : 'Not accepting payments' }}
           </p>
           <BaseButton :variant="deactivating ? 'danger' : 'primary'" @click="confirmOpen = true">
@@ -123,15 +157,14 @@ async function toggleStatus(): Promise<void> {
 
       <!-- Stats -->
       <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="overflow-hidden rounded-xl bg-ink text-white">
-          <div class="kente-thread" aria-hidden="true" />
-          <div class="p-5">
-            <p class="text-xs font-medium tracking-wide text-zinc-400 uppercase">Wallet balance</p>
-            <p class="mt-1.5 font-display text-2xl font-semibold">
-              {{ formatMoney(merchant.wallet_balance ?? 0) }}
-            </p>
-            <p class="mt-1 text-sm text-zinc-400">cleared at next settlement</p>
-          </div>
+        <!-- The merchant's own float: the figure this page leads on, so it
+             takes the brand colour that the other three stats don't. -->
+        <div>
+          <p class="text-xs font-medium tracking-wide text-muted uppercase">Wallet balance</p>
+          <p class="font-display mt-1.5 text-2xl font-semibold text-accent">
+            {{ formatMoney(merchant.wallet_balance ?? 0) }}
+          </p>
+          <p class="mt-1 text-sm text-muted">cleared at next settlement</p>
         </div>
         <StatCard
           label="Total settled"
@@ -153,8 +186,10 @@ async function toggleStatus(): Promise<void> {
       <!-- Transactions + settlements -->
       <div class="mt-6 grid gap-6 xl:grid-cols-2">
         <section>
-          <h3 class="mb-3 font-display text-sm font-semibold text-ink">Recent transactions</h3>
-          <div class="overflow-hidden rounded-xl border border-line bg-white">
+          <div class="panel">
+            <div class="panel-head">
+              <h3 class="font-display text-sm font-semibold text-ink">Recent transactions</h3>
+            </div>
             <div v-if="merchant.recent_transactions.length === 0" class="px-4 py-10">
               <EmptyState
                 :level="4"
@@ -170,16 +205,16 @@ async function toggleStatus(): Promise<void> {
                 class="flex items-center gap-3 px-4 py-3"
               >
                 <div class="min-w-0 flex-1">
-                  <p class="truncate font-mono text-xs text-zinc-500">
+                  <p class="truncate font-mono text-xs text-muted">
                     {{ transaction.reference }}
                   </p>
-                  <p class="text-xs text-zinc-500">{{ formatDateTime(transaction.created_at) }}</p>
+                  <p class="text-xs text-muted">{{ formatDateTime(transaction.created_at) }}</p>
                 </div>
                 <div class="text-right">
                   <p class="font-display text-sm font-semibold text-ink">
                     {{ formatMoney(transaction.gross_amount) }}
                   </p>
-                  <p class="text-xs text-zinc-500">net {{ formatMoney(transaction.net_amount) }}</p>
+                  <p class="text-xs text-muted">net {{ formatMoney(transaction.net_amount) }}</p>
                 </div>
                 <StatusBadge :status="transaction.status" />
               </li>
@@ -188,8 +223,10 @@ async function toggleStatus(): Promise<void> {
         </section>
 
         <section>
-          <h3 class="mb-3 font-display text-sm font-semibold text-ink">Recent settlements</h3>
-          <div class="overflow-hidden rounded-xl border border-line bg-white">
+          <div class="panel">
+            <div class="panel-head">
+              <h3 class="font-display text-sm font-semibold text-ink">Recent settlements</h3>
+            </div>
             <div v-if="merchant.recent_settlements.length === 0" class="px-4 py-10">
               <EmptyState
                 :level="4"
@@ -204,8 +241,8 @@ async function toggleStatus(): Promise<void> {
                 class="flex items-center gap-3 px-4 py-3"
               >
                 <div class="min-w-0 flex-1">
-                  <p class="truncate font-mono text-xs text-zinc-500">{{ settlement.reference }}</p>
-                  <p class="text-xs text-zinc-500">{{ formatDate(settlement.settled_at) }}</p>
+                  <p class="truncate font-mono text-xs text-muted">{{ settlement.reference }}</p>
+                  <p class="text-xs text-muted">{{ formatDate(settlement.settled_at) }}</p>
                 </div>
                 <p class="font-display text-sm font-semibold text-ink">
                   {{ formatMoney(settlement.amount) }}

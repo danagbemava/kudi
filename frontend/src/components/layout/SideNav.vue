@@ -11,7 +11,7 @@ defineProps<{ navId?: string }>()
 
 const emit = defineEmits<{ navigate: [] }>()
 
-const ACTIVE = 'bg-white/10 text-white'
+const ACTIVE = 'bg-violet-soft text-accent'
 
 /**
  * Highlighting is computed from the path rather than left to RouterLink's
@@ -58,25 +58,28 @@ const items = [
 </script>
 
 <template>
-  <div class="flex h-full flex-col bg-ink">
-    <div class="flex h-16 items-center px-5">
-      <KudiLogo light />
+  <div class="flex h-full flex-col border-r border-line bg-surface">
+    <div class="flex h-14 items-center px-4">
+      <KudiLogo />
     </div>
 
-    <nav :id="navId" class="flex-1 space-y-1 px-3 py-4" aria-label="Main navigation">
+    <nav :id="navId" class="flex-1 space-y-0.5 px-2.5 py-2" aria-label="Main navigation">
       <RouterLink
         v-for="item in items"
         :key="item.to"
         :to="item.to"
         :class="[
-          'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold',
-          isActive(item) ? ACTIVE : 'text-zinc-300 hover:bg-white/5 hover:text-white',
+          'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+          isActive(item)
+            ? `${ACTIVE} font-semibold`
+            : 'font-medium text-muted hover:bg-canvas hover:text-ink',
         ]"
         :aria-current="isActive(item) ? 'page' : undefined"
         @click="emit('navigate')"
       >
         <svg
-          class="size-5 text-zinc-400 transition-colors group-hover:text-zinc-200"
+          class="size-5 transition-colors"
+          :class="isActive(item) ? 'text-accent' : 'text-field group-hover:text-ink-soft'"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -89,11 +92,12 @@ const items = [
       </RouterLink>
     </nav>
 
-    <div class="border-t border-white/10 px-5 py-4">
-      <p class="text-[11px] leading-relaxed text-zinc-300">
-        Merchant Wallet &amp; Settlement<br />
-        <span class="text-zinc-400">Demo environment</span>
-      </p>
+    <div class="border-t border-line px-4 py-3.5">
+      <!-- Two blocks rather than one paragraph split by <br>, which
+           concatenated into "Merchant Wallet & SettlementDemo environment" when
+           read aloud. -->
+      <p class="text-[11px] leading-relaxed text-muted">Merchant Wallet &amp; Settlement</p>
+      <p class="text-[11px] leading-relaxed text-muted">Demo environment</p>
     </div>
   </div>
 </template>

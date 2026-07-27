@@ -1,46 +1,60 @@
-@import '@fontsource-variable/archivo/wdth.css';
-@import '@fontsource-variable/ibm-plex-sans';
-@import '@fontsource/ibm-plex-mono/400.css';
-@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
 @import 'tailwindcss';
 
 @theme {
-  /* Archivo carries a width axis, used expanded for money figures — the width
-     contrast against the body face is the identity, not a colour. */
-  --font-display: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  /* References and figures. Monospaced so columns of money and PAY- refs align
+     by construction rather than by tabular-figure opt-in. */
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, monospace;
 
-  /* Warm near-black rather than the blue-black every dashboard uses. */
-  --color-ink: #17181c;
-  --color-ink-soft: #2e3138;
-  /* Paper carries a faint green cast — Ghana's flag green pulled almost to
-     neutral. Not the cream that AI design defaults to. */
-  --color-paper: #f2f4f3;
-  --color-line: #e1e4e1;
-  /* Form-control boundaries: 3.1:1 on white, meeting SC 1.4.11. */
-  --color-field: #8d9490;
+  /* The page is white throughout. Structure comes from hairlines and space,
+     not from filled panels -- nothing on this screen is a card. `canvas` is
+     therefore only ever a hover or zebra tint, never a ground. */
+  --color-surface: #ffffff;
+  --color-canvas: #f7f7f6;
+  --color-line: #e6e6e2;
+  /* Row rules sit lighter than structural section rules. */
+  --color-line-soft: #f1f1ee;
 
-  /* Kente maize. The money colour, and the accent that replaces the default
-     indigo. 8.4:1 against ink, so it carries dark text — never the reverse:
-     gold on white is 2.2:1 and must never be used for text. */
-  --color-gold: #e8a317;
-  --color-gold-deep: #c7860b;
-  --color-gold-wash: #fdf3dd;
+  --color-ink: #1a1a1f;
+  --color-ink-soft: #45444d;
+  --color-muted: #6e6d78;
+  /* Form-control boundaries: 3.45:1 on white, 3.13:1 on canvas (SC 1.4.11). */
+  --color-field: #8a8994;
 
-  /* Forest is the interactive colour: 8.9:1 on white, so links and focus
-     rings are safe where gold would fail. */
-  --color-forest: #14543a;
-  --color-forest-deep: #0e3d2a;
-  --color-forest-wash: #e6efe9;
+  /* Kudi violet, sampled from the mark. Deliberately rationed -- at full
+     strength across the furniture it reads institutional rather than clean.
+     Reserved for identity and the primary action, where it fills an area and
+     the area carries the hue: the wordmark, and the primary button. */
+  --color-violet: #12013d;
+  --color-violet-soft: #f3f1f8;
 
-  --color-clay: #b33a2b;
-  --color-clay-wash: #fbeae7;
+  /* The same violet, opened up for text.
+     #12013D against #1A1A1F ink is a difference of seventeen points of red and
+     forty-four of blue: as a filled button that reads as violet, but in the
+     strokes of a glyph there is nothing for the hue to live in and both read
+     as black. Measured on the rendered page, the "one violet figure per
+     screen" rule was invisible on four of five screens.
+     This carries actual chroma while staying 10.9:1 on white, so figures,
+     links and focus rings can be recognisably violet rather than nominally so. */
+  --color-accent: #4c1d95;
+  /* The square from the logo's tittle. Only ever a mark, never a surface. */
+  --color-red: #d73e33;
+
+  /* Status is semantic and separate from the brand accent, so a violet button
+     can never be mistaken for a success state. */
+  --color-good: #0b5d52;
+  --color-good-wash: #e7f4ef;
+  --color-warn: #8a5a12;
+  --color-warn-wash: #fdf1dc;
+  --color-bad: #a32e25;
+  --color-bad-wash: #fbeae7;
 }
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-paper);
+  background: var(--color-surface);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
 }
@@ -50,22 +64,76 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* Money and headings: expanded, tight, tabular so columns of figures align. */
-.font-display {
-  font-family: var(--font-display);
-  font-stretch: 118%;
-  font-feature-settings: 'tnum';
-  letter-spacing: -0.02em;
+/* Browsers give buttons the default arrow; only anchors get a pointer. Without
+   this, half the controls on a page don't read as clickable. */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']) {
+  cursor: pointer;
 }
 
-/* Small uppercase labels run the other way — narrow tracking's opposite —
-   so the width contrast reads as deliberate. */
+/* Where the pointer is a finger, controls need a 44px target. Keyed off pointer
+   type rather than width alone, so a tablet with a touchscreen is covered too,
+   and left off precise pointers so a mouse UI stays compact. */
+@media (pointer: coarse), (max-width: 40rem) {
+  button,
+  [role='button'] {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+
+  /* Under 16px, iOS zooms the whole page when a field takes focus. */
+  input,
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+}
+
+/* Money and headline figures: tight tracking, tabular so columns align. */
+.font-display {
+  font-feature-settings: 'tnum';
+  letter-spacing: -0.03em;
+}
+
+/* Small uppercase labels above a figure. */
 .label-eyebrow {
-  font-family: var(--font-sans);
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* Every content block on the page. One primitive, so a table, a chart and a
+   stat all sit inside the same edge and the same radius -- mixing framed and
+   unframed blocks on one screen is what makes a layout look unresolved.
+   Unfilled: the border does the work, so a page of these stays quiet. */
+.panel {
+  border: 1px solid var(--color-line);
+  border-radius: 0.625rem;
+  overflow: hidden;
+}
+
+/* One dropdown treatment for the whole app. The native arrow sits hard against
+   the border, is a different glyph on every platform, and cannot be inset — so
+   it is replaced by a chevron drawn at the same 12px as every other control's
+   padding, with room reserved so a long option never runs underneath it. */
+.select-field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236e6d78' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem 1rem;
+  padding-right: 2.25rem;
+}
+
+/* A panel's own title bar, ruled off from the content below it. */
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--color-line);
+  padding: 0.875rem 1.25rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -12,10 +12,17 @@ class DashboardController extends Controller
 {
     public function __invoke(ReportingService $reporting): JsonResponse
     {
+        $float = $reporting->unsettledFloat();
+
         return response()->json(['data' => [
             'totals' => $reporting->totals(),
             'volume_series' => $reporting->volumeSeries(),
-            'unsettled' => $reporting->unsettledFloat(),
+            'unsettled' => $float['holders'],
+            'unsettled_meta' => [
+                'holder_count' => $float['holder_count'],
+                'remainder_count' => $float['remainder_count'],
+                'remainder_amount' => $float['remainder_amount'],
+            ],
             'last_settlement' => $reporting->lastSettlement(),
             'recent_transactions' => TransactionResource::collection(
                 Transaction::with('merchant')->latest()->limit(8)->get()

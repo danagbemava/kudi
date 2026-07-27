@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\InstitutionType;
 use App\Enums\MerchantStatus;
 use App\Models\Institution;
 use App\Models\Merchant;
@@ -19,9 +20,25 @@ class MerchantFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'business_name' => fake()->company(),
             'institution_id' => Institution::factory(),
-            'account_number' => fake()->numerify('##########'),
+            // Generated to match the institution, so seeded merchants satisfy
+            // the same rule the registration form enforces.
+            'account_number' => fn (array $attributes) => self::accountNumberFor(
+                $attributes['institution_id']
+            ),
             'status' => MerchantStatus::Active,
         ];
+    }
+
+    /** A mobile money wallet is a mobile number; a bank account is not. */
+    public static function accountNumberFor(mixed $institutionId): string
+    {
+        $institution = $institutionId instanceof Institution
+            ? $institutionId
+            : Institution::find($institutionId);
+
+        return $institution?->type === InstitutionType::MobileMoney
+            ? '0'.fake()->randomElement(['24', '20', '55', '27', '54', '50']).fake()->numerify('#######')
+            : fake()->numerify('##########');
     }
 
     public function inactive(): static

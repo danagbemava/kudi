@@ -15,6 +15,10 @@ Route::get('/', fn () => response()->json(['service' => 'Kudi Merchant Dashboard
  * applies them to /api routes it recognises as coming from a stateful origin.
  */
 Route::prefix('api')->group(function () {
-    Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
+    // No `guest` middleware: it answers an already-signed-in caller with a 302
+    // to an HTML page, which is not a shape this API speaks. AuthController
+    // handles that case in JSON, and rate-limits failed attempts itself so a
+    // success can clear the tally.
+    Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
 });

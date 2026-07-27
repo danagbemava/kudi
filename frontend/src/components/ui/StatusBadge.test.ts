@@ -4,11 +4,11 @@ import StatusBadge from './StatusBadge.vue'
 
 describe('StatusBadge', () => {
   it.each([
-    ['successful', 'text-forest'],
-    ['pending', 'text-ink-soft'],
-    ['failed', 'text-clay'],
-    ['active', 'text-forest'],
-    ['inactive', 'text-zinc-600'],
+    ['successful', 'text-good'],
+    ['pending', 'text-warn'],
+    ['failed', 'text-bad'],
+    ['active', 'text-good'],
+    ['inactive', 'text-ink-soft'],
   ] as const)('renders %s with its tone', (status, toneClass) => {
     const wrapper = mount(StatusBadge, { props: { status } })
 

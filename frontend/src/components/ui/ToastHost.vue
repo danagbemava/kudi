@@ -5,16 +5,16 @@ const { toasts, dismiss, hold, resume } = useToast()
 
 const tones = {
   success: {
-    panel: 'border-forest/25 bg-forest-wash text-forest-deep',
-    close: 'text-forest-deep hover:bg-forest-wash',
+    panel: 'border-good/25 bg-good-wash text-good',
+    close: 'text-good hover:bg-good-wash',
   },
   error: {
-    panel: 'border-clay/25 bg-clay-wash text-clay',
-    close: 'text-clay hover:bg-clay-wash',
+    panel: 'border-bad/25 bg-bad-wash text-bad',
+    close: 'text-bad hover:bg-bad-wash',
   },
   info: {
-    panel: 'border-line bg-white text-ink',
-    close: 'text-zinc-600 hover:bg-zinc-100',
+    panel: 'border-line bg-surface text-ink',
+    close: 'text-ink-soft hover:bg-canvas',
   },
 }
 </script>
@@ -23,14 +23,18 @@ const tones = {
   <!-- One live region on the container only. Putting role="status" on each toast
        as well would nest live regions and pull the dismiss button's name into
        the announcement. -->
+  <!-- Top right, clear of the 4rem header. Every action that raises a toast —
+       run settlement, simulate payment, register merchant, sign out — is itself
+       in the top right, so the confirmation appears where the click happened
+       rather than diagonally across the screen. -->
   <div
-    class="pointer-events-none fixed inset-x-4 bottom-4 z-[60] flex flex-col items-center gap-2 sm:inset-x-auto sm:right-6 sm:items-end"
+    class="pointer-events-none fixed inset-x-4 top-20 z-[60] flex flex-col items-center gap-2 sm:inset-x-auto sm:right-6 sm:items-end"
     role="status"
     aria-live="polite"
   >
     <TransitionGroup
       enter-active-class="transition duration-200 ease-out"
-      enter-from-class="translate-y-2 opacity-0"
+      enter-from-class="-translate-y-2 opacity-0"
       leave-active-class="transition duration-150 ease-in"
       leave-to-class="opacity-0"
     >

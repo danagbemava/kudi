@@ -3,25 +3,49 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SettlementIndexRequest;
 use App\Http\Resources\SettlementResource;
 use App\Models\Settlement;
+use App\Services\ReportingService;
 use App\Services\SettlementService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SettlementController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(SettlementIndexRequest $request): AnonymousResourceCollection
     {
+        [$column, $direction] = $this->sort($request, SettlementIndexRequest::SORTABLE, 'settled_at');
+
         $settlements = Settlement::query()
             ->with('merchant.institution')
             ->settledBetween($request->date('from'), $request->date('to'))
-            ->latest('settled_at')
-            ->latest('id')
-            ->paginate($this->perPage($request));
+            ->inBatch($request->string('batch'))
+            ->orderBy($column, $direction)
+            // Every row in a batch shares one settled_at, so id keeps paging
+            // stable within a run.
+            ->orderBy('id', 'desc')
+            ->paginate($this->perPage($request))
+            ->withQueryString();
 
         return SettlementResource::collection($settlements);
+    }
+
+    /**
+     * Settlement history grouped into the runs that produced it.
+     *
+     * The flat index above still exists for drilling into one batch; this is
+     * what the history screen leads with.
+     */
+    public function batches(SettlementIndexRequest $request, ReportingService $reporting): JsonResponse
+    {
+        $batches = $reporting->settlementBatches(
+            $request->date('from'),
+            $request->date('to'),
+            $this->perPage($request),
+        );
+
+        return response()->json($batches->toArray());
     }
 
     public function run(SettlementService $settlements): JsonResponse
