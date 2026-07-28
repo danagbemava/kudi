@@ -60,6 +60,9 @@ cd backend  && composer format:check  # Laravel Pint
 | ![Payment simulator](docs/screenshots/payment-simulator.png) | ![Mobile](docs/screenshots/transactions-mobile.png) |
 | **Payment simulator** — live gross → 1.5% fee → net breakdown | **Mobile** — ledgers become cards, filters collapse behind a toggle |
 
+> **[Watch the walkthrough](docs/demo.mp4)** (7 min) — registering a merchant, simulating a payment
+> through to the gateway result, running a settlement, and reading the reports.
+
 ## Design
 
 > The route here — six rounds of prototypes and two reversals — is recorded in the
@@ -90,7 +93,7 @@ The interface is built around the settlement cycle rather than around a grid of 
 
 
 - **Money is integers, end to end.** All amounts are stored and transported as integer minor units (pesewas). Only the frontend's `utils/money.ts` formats for humans. The fee is computed with pure integer math, rounded **half-up** (`fee = ⌊(gross × bp + 5000) / 10000⌋`) — the conventional commercial rounding, implemented identically in `App\Support\Money` and the frontend fee preview and pinned by tests on both sides. The rate itself has exactly one home: `KUDI_FEE_BASIS_POINTS`, served to the client from `/api/config`, so changing it can never leave the simulator quoting a rate the backend does not charge.
-- **Settlement decrements, never zeroes.** The settlement run locks wallet rows (`lockForUpdate`) inside one DB transaction, writes a settlement record per merchant, and decrements each balance by the settled amount rather than setting it to zero — a concurrent credit can never be silently destroyed. Each run shares one `BATCH-…` reference.
+- **Settlement decrements, never zeroes.** The settlement run locks wallet rows (`lockForUpdate`) inside one DB transaction, writes a settlement record per merchant, and decrements each balance by the settled amount rather than setting it to zero. Each run shares one `BATCH-…` reference.
 - **The invariant is tested.** `wallet.balance = Σ(successful net) − Σ(settled)` is asserted in the test suite, and the seeder satisfies it by replaying 30 days of activity chronologically with real settlement runs at historical timestamps.
 - **Pending payments never touch wallets.** They credit only when processed; a settlement run between creation and processing simply leaves them for the next batch.
 - **Race-safe processing.** The gateway callback endpoint re-checks the transaction status under a row lock inside the transaction, so two concurrent callbacks cannot double-credit a wallet.
@@ -149,9 +152,11 @@ All routes are JSON, under `auth:sanctum` unless noted.
 | POST | `/api/settlements/run` | Settle all positive balances into one batch |
 | GET | `/api/reports/summary` | Fees, volume, settled totals, outcome counts, daily series + the window it covers |
 
-## Tools used
+## Tools used / Development Process
 
-Built with AI-assisted development (Claude Code), per the brief's recommendation. All business rules, architecture decisions, and code were reviewed and are explainable by the author.
+Built with AI-assisted development (Claude Code). Development process involved coming up with a spec for the task in claude code to make some decisions. These include (but are not limited to), Api Design/UI Design (of which the history/thought process can be found in the [docs/decisions.md](docs/decisions.md) & [docs/design-log.md](docs/design-log.md)).
+
+After the spec was generated, claude iteratively moved through the implementation with me as the HITL (Human In The Loop). Claude was used for an accessibility/responsiveness pass using the `playwright-mcp` but there were several rounds of reviews on my part as the HITL to see if the vision I wanted was being brought to life. 
 
 ## Known limitations
 
