@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import VolumeChart from '../components/charts/VolumeChart.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
@@ -15,6 +15,20 @@ const dashboard = useDashboardStore()
 
 onMounted(() => {
   dashboard.fetch()
+})
+
+/**
+ * The "In flight" card leads with the *net* figure, because that is what these
+ * payments will actually add to the float and so the only figure comparable
+ * with "Waiting to settle" beside it. The gross belongs in the sub-line: it is
+ * what the customer was charged and what the transaction row shows, so leaving
+ * it out entirely would make the two screens look like they disagreed.
+ */
+const inFlightSub = computed(() => {
+  const totals = dashboard.data?.totals
+  if (!totals || totals.pending_count === 0) return 'nothing pending'
+
+  return `${totals.pending_count} pending · ${formatMoney(totals.pending_amount)} before fees`
 })
 </script>
 
@@ -101,8 +115,8 @@ onMounted(() => {
         />
         <StatCard
           label="In flight"
-          :value="formatMoney(dashboard.data?.totals.pending_amount ?? 0)"
-          :sub="`${dashboard.data?.totals.pending_count ?? 0} pending — not yet in a wallet`"
+          :value="formatMoney(dashboard.data?.totals.pending_net_amount ?? 0)"
+          :sub="inFlightSub"
           :loading="dashboard.loading"
         />
         <StatCard

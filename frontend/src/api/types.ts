@@ -78,8 +78,13 @@ export interface DashboardData {
     settled: number
     merchant_count: number
     pending_count: number
-    /** Gross value of payments still in flight. */
+    /** Gross value of payments still in flight — what customers were charged. */
     pending_amount: number
+    /**
+     * What those payments would actually add to the float once they resolve,
+     * net of the fee. This is the figure comparable with `wallet_balance`.
+     */
+    pending_net_amount: number
   }
   volume_series: DaySeriesPoint[]
   recent_transactions: Transaction[]

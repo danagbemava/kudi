@@ -38,9 +38,17 @@ class ReportingService
             'settled' => (int) Settlement::sum('amount'),
             'merchant_count' => Merchant::count(),
             'pending_count' => $pending->clone()->count(),
-            // What is still in flight. Pending money is float that has not
-            // landed in a wallet yet, so it changes what settling now catches.
+            // What is still in flight, reported both ways on purpose.
+            //
+            // `wallet_balance` above is money net of the fee — what actually
+            // reached a wallet. Quoting pending money in gross beside it put
+            // two different units on one row of cards: a GHS 667.32 payment
+            // resolving adds GHS 657.31 to the float, not GHS 667.32, and the
+            // dashboard appeared to lose the difference. The net figure is the
+            // comparable one and leads; the gross is what the customer was
+            // charged, so it is still worth stating.
             'pending_amount' => (int) $pending->clone()->sum('gross_amount'),
+            'pending_net_amount' => (int) $pending->clone()->sum('net_amount'),
         ];
     }
 

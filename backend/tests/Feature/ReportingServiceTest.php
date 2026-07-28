@@ -4,6 +4,7 @@ use App\Models\Merchant;
 use App\Models\Settlement;
 use App\Models\Transaction;
 use App\Services\ReportingService;
+use App\Support\Money;
 use Illuminate\Support\Carbon;
 
 beforeEach(function () {
@@ -116,6 +117,38 @@ describe('pending float', function () {
 
         expect($totals['pending_count'])->toBe(2)
             ->and($totals['pending_amount'])->toBe(50_000);
+    });
+
+    /**
+     * The dashboard sets this beside `wallet_balance`, which is money net of
+     * the fee. Reported only in gross, the two cards were in different units:
+     * a pending payment appeared to promise the float more than it could
+     * deliver, and the difference looked like it had gone missing.
+     */
+    it('also reports what pending payments would actually add to the float', function () {
+        Transaction::factory()->pending()->create([
+            'gross_amount' => 66_732,
+            'fee_amount' => Money::fee(66_732),
+            'net_amount' => 66_732 - Money::fee(66_732),
+        ]);
+
+        $totals = $this->reporting->totals();
+
+        expect($totals['pending_amount'])->toBe(66_732)
+            ->and($totals['pending_net_amount'])->toBe(65_731)
+            // The gap is exactly the fee those payments will be charged.
+            ->and($totals['pending_amount'] - $totals['pending_net_amount'])
+            ->toBe(Money::fee(66_732));
+    });
+
+    it('reports zero on both when nothing is pending', function () {
+        Transaction::factory()->create(['gross_amount' => 99_000]); // successful
+
+        $totals = $this->reporting->totals();
+
+        expect($totals['pending_count'])->toBe(0)
+            ->and($totals['pending_amount'])->toBe(0)
+            ->and($totals['pending_net_amount'])->toBe(0);
     });
 });
 
