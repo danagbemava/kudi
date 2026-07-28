@@ -77,9 +77,11 @@ The interface is built around the settlement cycle rather than around a grid of 
 
 - **Dashboard** — total merchant balances, payment volume, settlement totals, platform fees, a 30-day volume chart, and recent transactions.
 - **Merchants** — searchable/filterable list, registration with validation (bank *or mobile money* settlement institution), activate/deactivate with confirmation individually or in bulk, and a detail page with wallet, stats, transactions, and settlements.
-- **Payments** — a simulator that shows the gross → 1.5% fee → net breakdown live as you type, creates a `pending` transaction, then resolves it ~2s later via a simulated gateway callback (~90% success). Successful payments credit the merchant wallet with the net amount.
+- **Payments** — a simulator that shows the gross → fee → net breakdown live as you type, creates a `pending` transaction, then resolves it ~2s later via a simulated gateway callback (~90% success). Successful payments credit the merchant wallet with the net amount.
+- **Transactions** — sortable ledger with search, status, merchant and date filters. Any row opens a detail panel whose reference lives in the URL (`?tx=PAY-…`), so a specific payment can be linked to or reloaded and the back button closes the panel. A pending row carries its own **Check status** action: a payment otherwise only resolves while the tab that created it stays open, so anything left stranded — including transactions already pending when the session started — can be pushed through by hand.
 - **Settlements** — outstanding-balance banner, a manually triggered settlement run with a confirmation showing the exact amount to be moved, and history grouped into the runs that produced it: one row per sweep with its date, reference, merchant count and total, expanding to the merchants it paid. The totals are aggregated in SQL, so a batch that straddles a page boundary still reports the whole run. The dashboard also shows when the last run happened and what it moved, so the operator can tell whether one is due. Views update without a page reload.
 - **Reports** — platform fees earned, successful volume, settlement totals, a fees trend, and a transaction-outcome breakdown, with date-range presets and custom ranges. The chart states the window it covers, because that window is not always the one the totals cover: a span beyond 180 days is trimmed to the most recent slice and says so.
+- **Feedback** — actions confirm through toasts with an optional short chime, distinct per outcome. There is no `prefers-reduced-sound` media query to read, so the only way to respect someone working in a quiet room is a control that remembers the answer: a mute toggle in the header, persisted to `localStorage`.
 - **Auth** — session login via Laravel Sanctum's SPA cookie flow; all API routes are guarded. Failed sign-ins are rate-limited to five per minute per email+IP and answered with 429; a success clears the tally, so a mistyped password does not cost the rest of the minute. Sessions last `SESSION_LIFETIME` minutes (120 by default). When one lapses, the first 401 signs the user out, sends them to the login page with the page they were on preserved, and says why — rather than leaving them on a screen where every action silently fails. Returning to a backgrounded tab re-checks the session, so an expiry is caught on return rather than on the next click.
 
 ## Design decisions
@@ -101,7 +103,7 @@ The interface is built around the settlement cycle rather than around a grid of 
 
 Targeting WCAG 2.1 AA. Audited by hand across contrast, keyboard operability, forms, ARIA, landmarks, and SPA-specific concerns.
 
-- **Contrast** — measured programmatically, not eyeballed: an audit walks the rendered DOM on every page, composites each element's real background, and compares. It resolves colours by painting them to a canvas because Tailwind v4 emits `oklab()` for opacity-modified values, which a regex parser skips silently. Latest run: 1,268 elements, 0 unparseable, 0 failures across 1920/1440/390. Disabled controls are exempt per SC 1.4.3 but still kept legible.
+- **Contrast** — measured programmatically, not eyeballed: an audit walks the rendered DOM on every page, composites each element's real background, and compares. It resolves colours by painting them to a canvas because Tailwind v4 emits `oklab()` for opacity-modified values, which a regex parser skips silently. Latest run: 1,052 elements, 0 unparseable, 0 failures across every screen at 1920/1440/390. Disabled controls are exempt per SC 1.4.3 but still kept legible.
 - **Keyboard** — skip-to-content link, visible focus rings on every interactive element, focus trapped in dialogs and restored to the trigger on close. The mobile nav drawer is a real dialog: Escape closes it, focus moves in and returns.
 - **Forms** — every control has a bound `<label>`; server validation maps to per-field messages tied via `aria-describedby` with `aria-invalid`, and errors announce through `role="alert"`.
 - **Status messages** — route changes, result counts after filtering, and load failures all announce through live regions; SPA navigation and in-place table swaps are otherwise silent. The payment fee breakdown announces once, ~700ms after typing stops, rather than interrupting on every keystroke of the amount. Error toasts never auto-dismiss, and hovering or focusing a toast pauses its timer (SC 2.2.1).
@@ -112,8 +114,6 @@ Two findings worth calling out, because they are invisible in a static reading o
 
 - `BaseModal` listens for keys on `window`, not on the dialog element. A submit button that disables itself while loading makes browsers reset focus to `<body>`, at which point an element-bound handler stops receiving events — silently disabling both Escape and the focus trap. There is a regression test for this.
 - Form-control borders use a dedicated `--color-field` token at 3.4:1 rather than the decorative `--color-line` (1.23:1). SC 1.4.11 governs the boundary that identifies a control, and a near-white border on a near-white page fails it; card edges and dividers are decorative and correctly stay light.
-
-Contrast was re-audited in the browser after the palette change, resolving colours through a canvas because Tailwind v4 emits `oklab()` that string parsing misreads — 51–110 elements per route, every failure fixed.
 
 Known gaps: no automated axe/Lighthouse run (the next step, ideally in CI), and the mobile drawer relies on `inert`, which needs a polyfill below Safari 15.5.
 
@@ -130,7 +130,8 @@ All routes are JSON, under `auth:sanctum` unless noted.
 
 | Method | Path | Purpose |
 |---|---|---|
-| POST | `/login`, `/logout` | Session auth (guest / auth) |
+| POST | `/api/login` | Session auth. Rate-limited; answers an already-signed-in caller in JSON |
+| POST | `/api/logout` | Ends the session (`auth`) |
 | GET | `/api/user` | Current user |
 | GET | `/api/config` | Fee basis points and currency — the client mirrors these, never hardcodes them |
 | GET | `/api/dashboard` | Totals, 30-day volume series, float composition, recent transactions |
@@ -138,13 +139,15 @@ All routes are JSON, under `auth:sanctum` unless noted.
 | GET/POST | `/api/merchants` | List (search, status, sort, pagination) / register |
 | GET | `/api/merchants/{id}` | Profile, wallet, stats, recent transactions and settlements |
 | PATCH | `/api/merchants/{id}/status` | Activate / deactivate |
+| PATCH | `/api/merchants/status` | Activate / deactivate up to 200 at once |
 | GET | `/api/transactions` | List (search, status, merchant, date range, sort, pagination) |
+| GET | `/api/transactions/{reference}` | One transaction, bound on reference so a shared link keeps working |
 | POST | `/api/payments` | Create pending payment (fee precomputed) |
 | POST | `/api/transactions/{id}/process` | Simulated gateway callback: resolve pending |
 | GET | `/api/settlements` | List (date range, batch, sort, pagination) |
 | GET | `/api/settlements/batches` | History grouped into runs, with each run's own total |
 | POST | `/api/settlements/run` | Settle all positive balances into one batch |
-| GET | `/api/reports/summary` | Fees, volume, settled totals, outcome counts by period |
+| GET | `/api/reports/summary` | Fees, volume, settled totals, outcome counts, daily series + the window it covers |
 
 ## Tools used
 
