@@ -111,9 +111,7 @@ against the page.
 
 ## 7. The decision — Airy only
 
-> *"we don't necessary need to go full on with the branding, it will make it too busy"*
-
-The right call, and it ended the search. A full violet shell puts brand colour on every screen at
+A full violet shell puts brand colour on every screen at
 all times — the same weight problem as round one, relocated from the content to the furniture. It
 photographs well and wears badly over an eight-hour shift.
 
@@ -129,24 +127,5 @@ What shipped:
 - **Status colour is semantic and separate** from the brand accent, so a violet button can never be
   mistaken for a success state.
 
----
-
-## What the detour was actually for
-
-Rounds one to three were increasingly faithful to the mark and increasingly unpleasant to use. The
-deadlock broke by giving violet a *budget*, not by finding a better violet.
-
-Both corrections that mattered came from review, not from me: that Kudi already had a design
-language, and that the full-brand shell was too busy before it shipped.
-
-What survives from the discarded rounds is not visual — it is the measurements:
-
-- Two near-blacks never separate by luminance; the boundary needs hue and a border.
-- Three status colours cannot be *mutually* distinguishable and *all* readable on white — the
-  luminance range does not stretch that far, so the segments of a stacked bar have to be separated
-  structurally instead.
-- A violet chosen for text contrast is the wrong violet for a chart segment on a dark ground.
-- Tailwind v4 emits `oklab()` for opacity-modified colours, which silently defeats regex-based
-  contrast auditing. Colours have to be resolved by painting them to a canvas.
 
 📖 The specimens themselves are in **[`prototypes.html`](prototypes.html)**.

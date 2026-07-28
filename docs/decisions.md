@@ -19,8 +19,8 @@ ones and given the most care.
 
 **Money is integers end to end.** Every amount is stored and transported as integer minor units
 (pesewas); only `frontend/src/utils/money.ts` turns them into strings for people. Floats were never
-on the table — binary floating point cannot represent `0.10`, and a payments ledger that drifts by
-a rounding error is worthless. The alternative, decimal columns, would work in the database but
+not considered because binary floating point cannot represent `0.10`, and a payments ledger that drifts by
+a rounding error is harmful. The alternative, decimal columns, would work in the database but
 still invites float arithmetic the moment a value reaches JavaScript. Integers are the one
 representation that is exact in both languages.
 
@@ -109,27 +109,15 @@ merchants, transactions, settlements, over an API client with a single error-nor
 that owns "the current list, its meta, and how to refetch it," which is exactly what each page
 needs.
 
-**Shared types are extracted once they are written twice.** The Laravel paginator meta shape was
-being redeclared in three stores, in the `PaginationBar` props, and inside `Paginated<T>`; it is now
-one `PageMeta` interface. Extracting it also surfaced a latent bug — the stores *typed* three fields
-while *assigning* all six, so half the object was invisible to the compiler.
-
 ---
 
 ## Frontend behaviour and UX
 
-**Register merchant is a dialog, not an inline form.** An inline form below the list pushes the
-list around and buries the primary content; a dialog keeps the list stable and focuses the task.
 
 **Navigation highlight is computed from the path, not from RouterLink's matched records.** A merchant
 detail route (`/merchants/:id`) is a sibling of the list route, not a child, so RouterLink's own
 active-class does not treat the section as active on a detail page. Deriving it from the path keeps
 the correct nav item lit. This is asserted in a test that fails if the prefix matching is removed.
-
-**A lapsed session logs the user out rather than letting the page fail silently.** The first 401
-signs them out, sends them to login with the page they were on preserved and a reason shown, and
-returning to a backgrounded tab re-checks the session — so an expiry is caught on return rather than
-on the next click that mysteriously does nothing.
 
 **The open transaction lives in the URL.** `?tx=PAY-…` makes a specific payment linkable and
 reloadable, and lets the browser back button close the panel. Resolving it goes *through the store*,
@@ -192,7 +180,7 @@ simulated probability. This is how several of the bugs above were found in the f
 
 ## Deliberate non-goals
 
-These are choices too, and calling them out is more honest than leaving them to be discovered.
+These are choices too, that were decided not be implemented for this brief.
 
 - **Authorization is single-role by design.** This is a platform-operator back office: one signed-in
   identity, entitled to every merchant and transaction. The `users` table has no tenant key and
@@ -206,32 +194,15 @@ These are choices too, and calling them out is more honest than leaving them to 
   change to make first at scale.
 - **The gateway is simulated and not reconciled server-side.** Resolution depends on a client call;
   a scheduled reconciliation job is the production answer and is out of scope here.
-- **GenUI was evaluated and declined for this deliverable.** It fits nowhere near money movement, and
-  the one place it could help — natural-language ledger filtering — needs an API key that collides
-  with the brief's "do not commit secrets" and adds reviewer setup, for a feature the brief does not
-  score. Better spent elsewhere.
 - **`php artisan serve` backs the Docker image.** Fine for review traffic, not production, where it
   would be PHP-FPM behind nginx.
 
 ---
 
-## Decisions we reversed
+## Other features considered but not implemented
 
-The straight-line version of a build is a fiction. The reversals are where most of the judgment
-actually happened.
-
-- **Invented brand → the real one → rationed.** The first build shipped in a palette invented from
-  nothing while Kudi's logo sat on page one of the brief. Corrected to the real values, then
-  *over*-corrected into an institutional violet slab, and only resolved once the brand colour was
-  given a budget rather than a better hue. The full arc is in the [design log](design-log.md).
-- **Per-route container width → one width everywhere.** A full-screen pass showed 640px of unused
-  window, so the container was widened — but making the width depend on the route meant content
-  shifted position when navigating between Dashboard and Merchants. That is a worse problem than a
-  slightly wide summary page, so it was reverted to one container width for the whole shell, with the
-  dashboard laid out in columns internally instead.
-- **Persistent error toasts → auto-dismiss.** Errors were initially left on screen indefinitely on a
-  WCAG "no time limits on important content" reading. In practice that makes a panel the user has to
-  clean up. They now auto-dismiss on a longer timer, paused on hover/focus.
-
-Each of these was a real mistake caught and fixed, and each correction came from review rather than
-from the initial implementation — which is itself the argument for having the review.
+- **UI Versioning.** This was mainly for observability as well as analytics. The idea behind it is that we would
+know the exact version any user was using so that it would be easier to track which versions had bugs. 
+- **GenUI for Richer Reporting.** At the moment the reports are static, but I envisioned an a world where we could 
+integrate a Large Language Model (LLM) to generate rich reports/charts based on natural language. General LLM integration 
+was also considered for documentation and some help/reporting.
