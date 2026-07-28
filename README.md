@@ -60,6 +60,10 @@ cd backend  && composer format:check  # Laravel Pint
 | ![Payment simulator](docs/screenshots/payment-simulator.png) | ![Mobile](docs/screenshots/transactions-mobile.png) |
 | **Payment simulator** — live gross → 1.5% fee → net breakdown | **Mobile** — ledgers become cards, filters collapse behind a toggle |
 
+*The 1.5% above is the default rate, which is what these screenshots and the recording were captured
+at. It is configuration (`KUDI_FEE_BASIS_POINTS`) rather than a constant — the client reads it from
+`/api/config`, so a deployment on a different rate shows that rate everywhere, not this one.*
+
 > **[Watch the walkthrough](docs/demo.mp4)** (7 min) — registering a merchant, simulating a payment
 > through to the gateway result, running a settlement, and reading the reports.
 
