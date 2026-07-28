@@ -14,6 +14,11 @@ Thumbs.db
 # Scratch output from browser automation (screenshots, page snapshots).
 .playwright-mcp/
 
+# Working notes about the codebase rather than documentation of it. Kept on
+# disk, deliberately out of the repo — `git add -A` would otherwise pull it
+# back in.
+/REVIEW.md
+
 # Stray captures at the repo root. Screenshots that belong to the project live
 # in docs/screenshots and are anchored below this rule, so they still commit.
 /*.png
